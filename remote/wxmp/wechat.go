@@ -4,13 +4,10 @@ import (
 	"github.com/labstack/echo"
 	"github.com/kawaapp/kawaqing/remote"
 	"github.com/kawaapp/kawaqing/shared/httpx"
-	"github.com/kawaapp/kawaqing/store"
-
 	"encoding/json"
 	"fmt"
 	"log"
 	"errors"
-	"os"
 	"encoding/base64"
 	"crypto/aes"
 	"crypto/cipher"
@@ -164,19 +161,9 @@ func pkcs7UnPad(b []byte) []byte {
 }
 
 func (c *client) getIdSecret(ctx echo.Context) (id, secret string) {
-	if os.Getenv("STORE_LOCAL") != "" {
-		id, secret = c.Client, c.Secret
-	} else {
-		meta, err := store.FromContext(ctx).GetMetaData()
-		if err != nil {
-			return
-		}
-		id, secret = meta["xiaocx_id"], meta["xiaocx_secret"]
-	}
+	id, secret = c.Client, c.Secret
 	return
 }
-
-
 
 // 用code从微信服务器交换 token
 func (c *client) Exchange(id, secret, code string) (token AccessToken, err error) {
