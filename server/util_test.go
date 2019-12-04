@@ -2,7 +2,6 @@ package server
 
 import (
 	"testing"
-	"github.com/kawaapp/wsq/model"
 	"net/url"
 	"log"
 	"time"
@@ -49,12 +48,6 @@ func TestBitOperation(t *testing.T) {
 	if status != 0 {
 		t.Error("bit-2 not 0")
 	}
-}
-
-
-func TestAAA(t *testing.T) {
-	t.Error(model.UserSilenced)
-	t.Error(model.UserBlocked)
 }
 
 func TestURLEncoder(t *testing.T) {

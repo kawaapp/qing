@@ -4,7 +4,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/kawaapp/kawaqing/remote"
 	"github.com/kawaapp/kawaqing/shared/httpx"
-	"github.com/kawaapp/wsq/store"
+	"github.com/kawaapp/kawaqing/store"
 
 	"encoding/json"
 	"fmt"

@@ -26,7 +26,7 @@ func TestGetUserInfo(t *testing.T) {
 	}
 
 	var (
-		token  = "26_uVFhv-uKpy7D9aWz44cZsi7MmWQSU8HH5-CIJ2nyi9skgwsq80F9qbEHk4VM114BJydGXJl0zTXHC-Gy3tjQbQ"
+		token  = "26_uVFhv-uKpy7D9aWz44cZsi7MmWQSU8HH5-CIJ2nyi9skg80F9qbEHk4VM114BJydGXJl0zTXHC-Gy3tjQbQ"
 		openid = "obAkW5tDu2h346ryheJfBIAX-zrY"
 	)
 
