@@ -106,6 +106,7 @@ func CreateDiscussion(c echo.Context) error {
 	discussion := &model.Discussion{
 		AuthorID: user.ID,
 		Title: in.Title,
+		Content: in.Content,
 	}
 	if err := store.CreateDiscussion(c, discussion); err != nil {
 		return err
