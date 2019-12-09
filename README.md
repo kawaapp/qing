@@ -10,7 +10,7 @@
 关联字段，比如拉取一个接龙或者评论列表的时候，如果需要同时拉取对应的用户资料，可以在API的查询字段添加 include 查询，
 比如： /api/discussions?includes=user
 得到的返回结果，会包含一个 entities 字段包含了 user 字段
-
+0099
 {"code":0,"data":[],"entities":{
     1: { name: "123", id: 1} // id => user
 }}

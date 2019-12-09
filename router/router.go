@@ -27,7 +27,6 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 	{
 		// user
 		get.GET("/users/:id", server.GetUser)
-		get.GET("/users/self", server.Self)
 		get.GET("/users/:id/discussions", server.GetDiscussionByUser)
 		get.GET("/users/:id/posts", server.GetPostByUser)
 		get.GET("/users/:id/likes", server.GetLikeByUser)
@@ -63,6 +62,7 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 
 		// user
 		write.PUT("/users", server.UpdateUser)
+		write.GET("/users/self", server.Self)
 
 		// discussion
 		write.POST("/discussions", server.CreateDiscussion)
