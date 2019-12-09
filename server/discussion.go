@@ -174,7 +174,7 @@ func DeleteDiscussion(c echo.Context) error {
 		return c.NoContent(http.StatusForbidden)
 	}
 
-	if err := store.DeletePost(c, int64(id)); err != nil {
+	if err := store.DeleteDiscussion(c, int64(id)); err != nil {
 		return errors.New(fmt.Sprintf("Error: delete post %d. %s", id, err))
 	}
 	events.Dispatch(eDiscussionDeleted, c, d)
