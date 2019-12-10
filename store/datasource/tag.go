@@ -117,4 +117,4 @@ SELECT
 	_order,
 	text,
 	summary
-FROM tags ORDER BY refer DESC;`
+FROM tags ORDER BY _order DESC;`

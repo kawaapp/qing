@@ -93,7 +93,7 @@ func UpdateTag(c echo.Context) error {
 	in := (map[string]interface{})(m)
 
 	// Override existing value, only!
-	if value, ok := in["refer"]; ok {
+	if value, ok := in["order"]; ok {
 		tag.Order = int(value.(float64))
 	}
 	if value, ok := in["text"]; ok {

@@ -14,15 +14,15 @@ import (
 
 // likes
 func GetLikeList(c echo.Context) error {
-	cid, err := strconv.Atoi(c.Param("cid"))
+	cid, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "cid not found")
+		return c.String(http.StatusBadRequest, "id not found")
 	}
 	return getFavorList(c, int64(cid))
 }
 
 func GetLikeCount(c echo.Context) error {
-	cid, err := strconv.Atoi(c.Param("cid"))
+	cid, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.String(http.StatusBadRequest, "cid not found")
 	}
