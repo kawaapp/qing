@@ -66,10 +66,12 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 
 		// discussion
 		write.POST("/discussions", server.CreateDiscussion)
+		write.PUT("/discussions/:id", server.UpdateDiscussion)
 		write.DELETE("/discussions/:id", server.DeleteDiscussion)
 
 		// posts
 		write.POST("/discussions/posts", server.CreatePost)
+		write.PUT("/discussions/posts/:id", server.UpdatePost)
 		write.DELETE("/discussions/posts/:id", server.DeletePost)
 
 		// likes

@@ -252,6 +252,28 @@
 2. 删除一个接龙个 `DELETE /api/discussions/:id`
 返回 200
 
+3. 更新接龙 `PUT /api/discussions/:id`
+```
+{
+	"title": "标题更新啦",
+	"content": "内容也更新啦"
+}
+```
+返回：
+```
+{
+    "id": 7,
+    "created_at": 1579070277,
+    "updated_at": 1579070277,
+    "title": "标题更新啦",
+    "content": "内容也更新啦",
+    "author_id": 1,
+    "first_post": 0,
+    "last_post": 0,
+    "comment_count": 0
+}
+```
+
 
 **接龙评论**
 1. 获取接龙下的评论列表 `Get /api/discussions/26/posts?includes=user`
@@ -325,6 +347,24 @@
 }
 4. 删除评论 `DEL  /api/discussions/posts/:id`
 返回 200
+
+5. 更新评论 `PUT /api/discussions/posts/:id`
+只能更新 content 字段
+```
+{
+	"content": "内容更新啦"
+}
+```
+返回：
+{
+    "id": 13,
+    "created_at": 1579069965,
+    "discussion_id": 1,
+    "parent_id": 0,
+    "author_id": 1,
+    "reply_id": 0,
+    "content": "内容更新啦"
+}
 
 ** 标签 **
 1. 获取标签列表 `GET /api/tags`

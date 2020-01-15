@@ -141,19 +141,32 @@ func UpdateDiscussion(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
+	d, err := store.FromContext(c).GetDiscussion(int64(id))
+	if err != nil {
+		return err
+	}
+
 	// ensure author is valid
 	user := session.User(c)
-	if user.Login != "Admin" {
+	if user.ID != d.AuthorID {
 		return c.NoContent(http.StatusForbidden)
 	}
 
-	d := new(model.Discussion)
-	if err := c.Bind(d); err != nil {
-		return c.NoContent(http.StatusBadRequest)
+	m := echo.Map{}
+	if err := c.Bind(&m); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
 	}
-	d.ID = int64(id)
+	in := (map[string]interface{})(m)
+
+	// partial update
+	if value, ok := in["title"]; ok {
+		d.Title = value.(string)
+	}
+	if value, ok := in["content"]; ok {
+		d.Content = value.(string)
+	}
 	if err := store.UpdateDiscussion(c, d); err != nil {
-		return errors.New(fmt.Sprintf("Error: update post %d. %s", id, err))
+		return errors.New(fmt.Sprintf("Error: update discussion %d. %s", id, err))
 	}
 	return c.JSON(200, d)
 }

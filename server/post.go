@@ -102,21 +102,31 @@ func UpdatePost(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
+	p, err := store.FromContext(c).GetPost(int64(id))
+	if err != nil {
+		return err
+	}
+
 	// ensure author is valid
 	user := session.User(c)
-	if user.Login != "Admin" {
+	if user.ID != p.AuthorID {
 		return c.NoContent(http.StatusForbidden)
 	}
 
-	cmt := new(model.Post)
-	if err := c.Bind(cmt); err != nil {
-		return c.NoContent(http.StatusBadRequest)
+	m := echo.Map{}
+	if err := c.Bind(&m); err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
 	}
-	cmt.ID = int64(id)
-	if err := store.UpdatePost(c, cmt); err != nil {
+	in := (map[string]interface{})(m)
+
+	// partial update
+	if value, ok := in["content"]; ok {
+		p.Content = value.(string)
+	}
+	if err := store.UpdatePost(c, p); err != nil {
 		return err
 	}
-	return c.JSON(200, cmt)
+	return c.JSON(200, p)
 }
 
 func DeletePost(c echo.Context) error {
