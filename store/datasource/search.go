@@ -6,18 +6,6 @@ import (
 	"fmt"
 )
 
-func (db *datasource) SearchPost(params model.QueryParams, page, size int) ([]*model.Post, error) {
-	data := make([]*model.Post, 0)
-	query, args := sqlPostQuery("SELECT * ", params, page, size)
-	err := meddler.QueryAll(db, &data, query, args...)
-	return data, err
-}
-
-func (db *datasource) SearchPostCount(params model.QueryParams) (int, error) {
-	query, args := sqlPostQuery("SELECT COUNT(*) ", params, 0, 0)
-	return db.Count(query, args...)
-}
-
 func (db *datasource) SearchReport(params model.QueryParams, page, size int) ([]*model.Report, error) {
 	reports := make([]*model.Report, 0)
 	query, args := sqlReportQuery(sqlReportBase, params, page, size)
@@ -45,58 +33,6 @@ func (db *datasource) Count(stmt string, args ...interface{}) (int, error) {
 	var count int
 	err := rows.Scan(&count)
 	return count, err
-}
-
-
-func sqlDiscussionQuery(queryBase string, params model.QueryParams, page, size int) (query string, args []interface{}) {
-	query += queryBase
-	query += " FROM discussions"
-
-	where := ""
-	if q, ok := params["content"]; ok {
-		where += " AND content LIKE ?"
-		args = append(args, "%" + q + "%")
-	}
-
-	// TODO JOIN!
-	if q, ok := params["author"]; ok {
-		where += " AND author_id IN (SELECT id FROM users WHERE nickname=?)"
-		args = append(args, q)
-	}
-
-	if len(where) > 0 {
-		query += " WHERE 1=1" + where
-	}
-
-	if size > 0 {
-		query += fmt.Sprintf(" ORDER BY id DESC LIMIT %d OFFSET %d", size, page * size)
-	}
-	return
-}
-
-func sqlPostQuery(queryBase string, params model.QueryParams, page, size int) (query string, args []interface{}) {
-	query += queryBase
-	query += " FROM posts"
-
-	where := ""
-	if q, ok := params["content"]; ok {
-		where += " AND content LIKE ?"
-		args = append(args, "%" + q + "%")
-	}
-
-	if q, ok := params["author"]; ok {
-		where += " AND author_id IN (SELECT id FROM users WHERE nickname=?)"
-		args = append(args, q)
-	}
-
-	if len(where) > 0 {
-		query += " WHERE 1=1" + where
-	}
-
-	if size > 0 {
-		query += fmt.Sprintf(" ORDER BY id DESC LIMIT %d OFFSET %d", size, page * size)
-	}
-	return
 }
 
 const sqlReportBase = `

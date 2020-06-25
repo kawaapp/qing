@@ -54,13 +54,14 @@ func SearchPosts(c echo.Context) error {
 		page, size = getPageSize(c)
 		params = getQueryParams(c)
 	)
-	posts, err := store.SearchPost(c, params, page, size)
+	db := store.FromContext(c)
+	posts, err := db.GetPostList(params, page, size)
 	if err != nil {
 		return err
 	}
 	p := makePayload(0, posts)
 	if page == 0 {
-		num, _ := store.SearchPostCount(c, params)
+		num, _ := db.GetPostCount(params)
 		p.Total = num
 	}
 	if includes(c, "user") {

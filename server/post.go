@@ -25,7 +25,10 @@ func GetPostList(c echo.Context) error {
 	}
 	page, size := getPageSize(c)
 
-	posts, err := store.GetPostList(c, int64(pid), page, size)
+	q := model.QueryParams{
+		"pid" : strconv.Itoa(pid),
+	}
+	posts, err := store.FromContext(c).GetPostList(q, page, size)
 	if err != nil {
 		return err
 	}

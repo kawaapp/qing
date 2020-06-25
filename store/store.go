@@ -36,9 +36,6 @@ type AdminStore interface {
 	GetNewDiscussionDaily(from, to time.Time) ([]*model.DailyCount, error)
 
 
-	SearchPost(params model.QueryParams, page, size int) ([]*model.Post, error)
-	SearchPostCount(params model.QueryParams) (int, error)
-
 	SearchReport(params model.QueryParams, page, size int) ([]*model.Report, error)
 	SearchReportCount(params model.QueryParams) (int, error)
 
@@ -84,10 +81,11 @@ type DiscussionStore interface {
 }
 
 type PostStore interface {
-	GetPostList(did int64, page, size int) ([]*model.Post, error)
+	GetPostList(params model.QueryParams, page, size int) ([]*model.Post, error)
+	GetPostCount(params model.QueryParams) (int, error)
+
 	GetPostListUser(uid int64, page, size int) ([]*model.Post, error)
 	GetPostListByIds(ids []int64) ([]*model.Post, error)
-	GetPostCount(pid int64) (int, error)
 	GetPost(id int64) (*model.Post, error)
 
 	CreatePost(p *model.Post) error
@@ -244,10 +242,6 @@ func DeleteDiscussion(c echo.Context, id int64) error {
 }
 
 // posts
-func GetPostList(c echo.Context, pid int64, page, size int) ([]*model.Post, error) {
-	return FromContext(c).GetPostList(pid, page, size)
-}
-
 func GetPost(c echo.Context, id int64) (*model.Post, error) {
 	return FromContext(c).GetPost(id)
 }
@@ -351,14 +345,6 @@ func GetDailyNewFavor(c echo.Context, from, to time.Time) ([]*model.DailyCount, 
 }
 
 // search
-func SearchPost(c echo.Context, params model.QueryParams, page, size int) ([]*model.Post, error) {
-	return FromContext(c).SearchPost(params, page, size)
-}
-
-func SearchPostCount(c echo.Context, params model.QueryParams) (int, error) {
-	return FromContext(c).SearchPostCount(params)
-}
-
 func SearchReport(c echo.Context, params model.QueryParams, page, size int) ([]*model.Report, error)  {
 	return FromContext(c).SearchReport(params, page, size)
 }

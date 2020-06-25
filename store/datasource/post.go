@@ -7,11 +7,17 @@ import (
 )
 
 // post
-func (db *datasource) GetPostList(did int64, page, size int) ([]*model.Post, error) {
-	stmt := sqlPostList
+
+func (db *datasource) GetPostList(params model.QueryParams, page, size int) ([]*model.Post, error) {
 	data := make([]*model.Post, 0)
-	err := meddler.QueryAll(db, &data, stmt, did, size, page * size)
+	query, args := sqlPostQuery("SELECT * ", params, page, size)
+	err := meddler.QueryAll(db, &data, query, args...)
 	return data, err
+}
+
+func (db *datasource) GetPostCount(params model.QueryParams) (int, error) {
+	query, args := sqlPostQuery("SELECT COUNT(*) ", params, 0, 0)
+	return db.Count(query, args...)
 }
 
 func (db *datasource) GetPostListUser(uid int64, page, size int) ([]*model.Post, error) {
@@ -31,14 +37,6 @@ func (db *datasource) GetPostListByIds(ids []int64) ([]*model.Post, error) {
 	data := make([]*model.Post, 0)
 	err := meddler.QueryAll(db, &data, fmt.Sprintf(stmt, q))
 	return data, err
-}
-
-func (db *datasource) GetPostCount(pid int64) (int, error) {
-	stmt := sqlCommentCount
-	rows := db.QueryRow(stmt, pid)
-	var count int
-	err := rows.Scan(&count)
-	return count, err
 }
 
 func (db *datasource) GetPost(id int64) (*model.Post, error) {
@@ -79,11 +77,30 @@ SELECT
 	content
 `
 
-const sqlPostList = sqlPostSelect + `
-FROM posts
-WHERE discussion_id=?
-ORDER BY id DESC LIMIT ? OFFSET ?
-;`
+func sqlPostQuery(queryBase string, params model.QueryParams, page, size int) (query string, args []interface{}) {
+	query += queryBase
+	query += " FROM posts"
+
+	where := ""
+	if q, ok := params["content"]; ok {
+		where += " AND content LIKE ?"
+		args = append(args, "%" + q + "%")
+	}
+
+	if q, ok := params["author"]; ok {
+		where += " AND author_id IN (SELECT id FROM users WHERE nickname=?)"
+		args = append(args, q)
+	}
+
+	if len(where) > 0 {
+		query += " WHERE 1=1" + where
+	}
+
+	if size > 0 {
+		query += fmt.Sprintf(" ORDER BY id DESC LIMIT %d OFFSET %d", size, page * size)
+	}
+	return
+}
 
 const sqlPostListByUser = sqlPostSelect + `
 FROM posts

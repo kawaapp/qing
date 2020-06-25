@@ -66,20 +66,31 @@ SELECT
 	comment_count
 `
 
-const sqlDiscussionList = sqlDiscussionSelect +`
-FROM discussions
-ORDER BY id DESC LIMIT ? OFFSET ?;`
+func sqlDiscussionQuery(queryBase string, params model.QueryParams, page, size int) (query string, args []interface{}) {
+	query += queryBase
+	query += " FROM discussions"
 
-const sqlListDiscussionComments = sqlDiscussionSelect + `
-FROM discussions
-ORDER BY comment_count DESC, id DESC LIMIT ? OFFSET ?
-;`
+	where := ""
+	if q, ok := params["content"]; ok {
+		where += " AND content LIKE ?"
+		args = append(args, "%" + q + "%")
+	}
 
-const sqlListDiscussionByUser = sqlDiscussionSelect +`
-FROM discussions
-WHERE author_id = ?
-ORDER BY id DESC LIMIT ? OFFSET ?
-;`
+	// TODO JOIN!
+	if q, ok := params["author"]; ok {
+		where += " AND author_id IN (SELECT id FROM users WHERE nickname=?)"
+		args = append(args, q)
+	}
+
+	if len(where) > 0 {
+		query += " WHERE 1=1" + where
+	}
+
+	if size > 0 {
+		query += fmt.Sprintf(" ORDER BY id DESC LIMIT %d OFFSET %d", size, page * size)
+	}
+	return
+}
 
 const sqlListPostByIds = sqlDiscussionSelect +`
 FROM discussions
