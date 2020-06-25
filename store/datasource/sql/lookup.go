@@ -2,7 +2,6 @@ package sql
 
 import (
 	"github.com/kawaapp/kawaqing/store/datasource/sql/mysql"
-	"github.com/kawaapp/kawaqing/store/datasource/sql/postgres"
 	"github.com/kawaapp/kawaqing/store/datasource/sql/sqlite"
 )
 

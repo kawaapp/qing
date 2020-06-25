@@ -7,28 +7,17 @@ import (
 	"database/sql"
 )
 
-func (db *datasource) GetUserList(sinceId int64, limit int, filter string) ([]*model.User, error) {
-	stmt := sqlGetUserList
-	data := make([]*model.User, 0)
-	err := meddler.QueryAll(db, &data, stmt, sinceId, limit)
-	return data, err
+func (db *datasource) GetUserList(params model.QueryParams, page, size int) ([]*model.User, error) {
+	users := make([]*model.User, 0)
+	query, args := sqlUserQuery("SELECT * ", params, page, size)
+	err := meddler.QueryAll(db, &users, query, args...)
+	return users, err
 }
 
-func (db *datasource) GetUserListSign(page int, size int) ([]*model.User, error) {
-	if page == 0 {
-		page = 1
-	}
-	stmt := sqlGetUserListSign
-	data := make([]*model.User, 0)
-	err := meddler.QueryAll(db, &data, stmt, size, (page-1) * size)
-	return data, err
-}
-
-func (db *datasource) GetUserListExp(page int, size int) ([]*model.User, error) {
-	stmt := sqlGetUserListExp
-	data := make([]*model.User, 0)
-	err := meddler.QueryAll(db, &data, stmt, size, (page-1) * size)
-	return data, err
+func (db *datasource) GetUserCount(params model.QueryParams) (int, error) {
+	query, args := sqlUserQuery("SELECT COUNT(id)", params, 0, 0)
+	num, err := db.Count(query, args...)
+	return num, err
 }
 
 func (db *datasource) GetUser(id int64) (*model.User, error) {
@@ -190,6 +179,40 @@ SELECT
 	password_hash
 `
 
+// user
+func sqlUserQuery(queryBase string, params model.QueryParams, page, size int) (query string, args []interface{}) {
+	query += queryBase
+	query += " FROM users"
+
+	where := ""
+	if q, ok := params["login"]; ok {
+		where += " AND login=?"
+		args = append(args, q)
+	}
+
+	if 	q, ok := params["nickname"]; ok {
+		where += " AND nickname LIKE ?"
+		args = append(args, "%" + q + "%")
+	}
+
+	if _, ok := params["silence"]; ok {
+		where += " AND silenced_at > ?"
+	}
+
+	if _, ok := params["block"]; ok {
+		where += " AND blocked_at > 0"
+	}
+
+	if len(where) > 0 {
+		query += " WHERE 1=1" + where
+	}
+
+	if size > 0 {
+		query += fmt.Sprintf(" ORDER BY id DESC LIMIT %d OFFSET %d", size, page * size)
+	}
+	return
+}
+
 const sqlUserFindByIds = sqlUserSelect + `
 FROM users
 WHERE id IN (%s);`
@@ -214,35 +237,3 @@ FROM users
 INNER JOIN user_binds
 ON (users.id = user_binds.user_id AND user_binds.union_id=?)
 ;`
-
-const sqlGetUserList = sqlUserSelect + `
-FROM users
-WHERE users.id < ?
-ORDER BY users.id DESC LIMIT ?
-`
-
-const sqlGetUserListSign = `
-SELECT
-	users.id,
-	users.created_at,
-	login,
-	status,
-	nickname,
-	avatar,
-	sign_count
-FROM users WHERE nickname != ''
-ORDER BY sign_count DESC, id DESC LIMIT ? OFFSET ?
-`
-
-const sqlGetUserListExp = `
-SELECT
-	users.id,
-	users.created_at,
-	login,
-	status,
-	nickname,
-	avatar,
-	exp_count,
-FROM users
-ORDER BY exp_count DESC, id DESC LIMIT ? OFFSET ?
-`

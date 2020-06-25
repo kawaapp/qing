@@ -6,18 +6,6 @@ import (
 	"fmt"
 )
 
-func (db *datasource) SearchUser(params model.QueryParams, page, size int) ([]*model.User, error) {
-	users := make([]*model.User, 0)
-	query, args := sqlUserQuery("SELECT * ", params, page, size)
-	err := meddler.QueryAll(db, &users, query, args...)
-	return users, err
-}
-
-func (db *datasource) SearchUserCount(params model.QueryParams) (int, error) {
-	query, args := sqlUserQuery("SELECT COUNT(id)", params, 0, 0)
-	num, err := db.Count(query, args...)
-	return num, err
-}
 
 func (db *datasource) SearchDiscussion(params model.QueryParams, page, size int) ([]*model.Discussion, error) {
 	data := make([]*model.Discussion, 0)
@@ -73,39 +61,6 @@ func (db *datasource) Count(stmt string, args ...interface{}) (int, error) {
 	return count, err
 }
 
-// user
-func sqlUserQuery(queryBase string, params model.QueryParams, page, size int) (query string, args []interface{}) {
-	query += queryBase
-	query += " FROM users"
-
-	where := ""
-	if q, ok := params["login"]; ok {
-		where += " AND login=?"
-		args = append(args, q)
-	}
-
-	if 	q, ok := params["nickname"]; ok {
-		where += " AND nickname LIKE ?"
-		args = append(args, "%" + q + "%")
-	}
-
-	if _, ok := params["silence"]; ok {
-		where += " AND silenced_at > ?"
-	}
-
-	if _, ok := params["block"]; ok {
-		where += " AND blocked_at > 0"
-	}
-
-	if len(where) > 0 {
-		query += " WHERE 1=1" + where
-	}
-
-	if size > 0 {
-		query += fmt.Sprintf(" ORDER BY id DESC LIMIT %d OFFSET %d", size, page * size)
-	}
-	return
-}
 
 func sqlDiscussionQuery(queryBase string, params model.QueryParams, page, size int) (query string, args []interface{}) {
 	query += queryBase

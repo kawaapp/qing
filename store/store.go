@@ -35,9 +35,6 @@ type AdminStore interface {
 	GetNewDiscussion(day time.Time) (int, error)
 	GetNewDiscussionDaily(from, to time.Time) ([]*model.DailyCount, error)
 
-	// search
-	SearchUser(params model.QueryParams, page, size int) ([]*model.User, error)
-	SearchUserCount(params model.QueryParams) (int, error)
 
 	SearchDiscussion(params model.QueryParams, page, size int) ([]*model.Discussion, error)
 	SearchDiscussionCount(params model.QueryParams) (int, error)
@@ -53,6 +50,9 @@ type AdminStore interface {
 }
 
 type UserStore interface {
+	GetUserList(params model.QueryParams, page, size int) ([]*model.User, error)
+	GetUserCount(params model.QueryParams) (int, error)
+
 	GetUser(id int64) (*model.User, error)
 	GetUserIdList(ids []int64) ([]*model.User, error)
 	GetUserByLogin(string) (*model.User, error)
@@ -71,8 +71,6 @@ type UserStore interface {
 	CreateBindUser(user *model.User, bind *model.UserBind) error
 
 	// user-exp-sign
-	GetUserListSign(page int, size int) ([]*model.User, error)
-	GetUserListExp(page int, size int) ([]*model.User, error)
 	UpdateUserExp(uid int64, exp int) error
 	UpdateUserSign(uid int64, count int) error
 }
@@ -360,13 +358,6 @@ func GetDailyNewFavor(c echo.Context, from, to time.Time) ([]*model.DailyCount, 
 }
 
 // search
-func SearchUser(c echo.Context, params model.QueryParams, page, size int) ([]*model.User, error) {
-	return FromContext(c).SearchUser(params, page, size)
-}
-
-func SearchUserCount(c echo.Context, params model.QueryParams) (int, error) {
-	return FromContext(c).SearchUserCount(params)
-}
 
 func SearchDiscussion(c echo.Context, params model.QueryParams, page, size int) ([]*model.Discussion, error) {
 	return FromContext(c).SearchDiscussion(params, page, size)

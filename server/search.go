@@ -12,14 +12,15 @@ func SearchUser(c echo.Context) error {
 		page, size = getPageSize(c)
 		params = getQueryParams(c)
 	)
-	users, err := store.SearchUser(c, params, page, size)
+	db := store.FromContext(c)
+	users, err := db.GetUserList(params, page, size)
 	if err != nil {
 		return err
 	}
 
 	p := makePayload(0, users)
 	if page == 0 {
-		num, _ := store.SearchUserCount(c, params)
+		num, _ := db.GetUserCount(params)
 		p.Total = num
 	}
 	return c.JSON(200, p)

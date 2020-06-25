@@ -3,7 +3,6 @@ package ddl
 import (
 	"database/sql"
 	"github.com/kawaapp/kawaqing/store/datasource/ddl/mysql"
-	"github.com/kawaapp/kawaqing/store/datasource/ddl/postgres"
 	"github.com/kawaapp/kawaqing/store/datasource/ddl/sqlite"
 )
 
