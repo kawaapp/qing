@@ -23,8 +23,6 @@ func Migrate(driver string, db *sql.DB) error {
 	switch driver {
 	case DriverMySQL:
 		return mysql.Migrate(db)
-	case DriverPostgres:
-		return postgres.Migrate(db)
 	case DriverSqlite:
 		fallthrough
 	default:

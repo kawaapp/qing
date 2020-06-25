@@ -19,8 +19,6 @@ func Lookup(driver string, name string) string {
 	switch driver {
 	case DriverMySQL:
 		return mysql.Lookup(name)
-	case DriverPostgres:
-		return postgres.Lookup(name)
 	case DriverSqlite:
 		fallthrough
 	default:
