@@ -7,24 +7,17 @@ import (
 )
 
 // posts
-func (db *datasource) GetDiscussionList(page, size int, filter string) ([]*model.Discussion, error) {
-	var stmt = sqlDiscussionList
+func (db *datasource) GetDiscussionList(params model.QueryParams, page, size int) ([]*model.Discussion, error) {
 	data := make([]*model.Discussion, 0)
-	err := meddler.QueryAll(db, &data, stmt, size, page * size)
+	query, args := sqlDiscussionQuery("SELECT * ", params, page, size)
+	err := meddler.QueryAll(db, &data, query, args...)
 	return data, err
 }
 
-func (db *datasource) GetDiscussionListCommentCount(page int, size int) ([]*model.Discussion, error) {
-	data := make([]*model.Discussion, 0)
-	err := meddler.QueryAll(db, &data, sqlListDiscussionComments, size, page * size)
-	return data, err
-}
-
-func (db *datasource) GetDiscussionListUser(uid int64, page, size int) ([]*model.Discussion, error) {
-	stmt := sqlListDiscussionByUser
-	data := make([]*model.Discussion,0)
-	err := meddler.QueryAll(db, &data, stmt, uid, size, page * size)
-	return data, err
+func (db *datasource) GetDiscussionCount(params model.QueryParams) (int, error)  {
+	query, args := sqlDiscussionQuery("SELECT COUNT(id) ", params, 0, 0)
+	num, err := db.Count(query, args...)
+	return num, err
 }
 
 func (db *datasource) GetDiscussionListByIds(ids []int64) ([]*model.Discussion, error) {

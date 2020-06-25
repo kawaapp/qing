@@ -6,20 +6,6 @@ import (
 	"fmt"
 )
 
-
-func (db *datasource) SearchDiscussion(params model.QueryParams, page, size int) ([]*model.Discussion, error) {
-	data := make([]*model.Discussion, 0)
-	query, args := sqlDiscussionQuery("SELECT * ", params, page, size)
-	err := meddler.QueryAll(db, &data, query, args...)
-	return data, err
-}
-
-func (db *datasource) SearchDiscussionCount(params model.QueryParams) (int, error)  {
-	query, args := sqlDiscussionQuery("SELECT COUNT(id) ", params, 0, 0)
-	num, err := db.Count(query, args...)
-	return num, err
-}
-
 func (db *datasource) SearchPost(params model.QueryParams, page, size int) ([]*model.Post, error) {
 	data := make([]*model.Post, 0)
 	query, args := sqlPostQuery("SELECT * ", params, page, size)

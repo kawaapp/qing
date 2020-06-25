@@ -31,14 +31,15 @@ func SearchDiscussions(c echo.Context) error {
 		page, size = getPageSize(c)
 		params = getQueryParams(c)
 	)
-	discussions, err := store.SearchDiscussion(c, params, page, size)
+	db := store.FromContext(c)
+	discussions, err := db.GetDiscussionList(params, page, size)
 	if err != nil {
 		return err
 	}
 
 	p := makePayload(0, discussions)
 	if page == 0 {
-		num, _ := store.SearchDiscussionCount(c, params)
+		num, _ := db.GetDiscussionCount(params)
 		p.Total = num
 	}
 

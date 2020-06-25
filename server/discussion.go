@@ -38,8 +38,11 @@ func GetDiscussionList(c echo.Context) error {
 		//sort   = c.FormValue("sort")
 		page, size = getPageSize(c)
 	)
-
-	discussions, err := store.GetDiscussionList(c, page, size, filter)
+	db := store.FromContext(c)
+	q := model.QueryParams{
+		"filter": filter,
+	}
+	discussions, err := db.GetDiscussionList(q, page, size)
 	if err != nil {
 		return err
 	}
@@ -213,7 +216,10 @@ func GetDiscussionByUser(c echo.Context) error {
 	}
 
 	page, size := getPageSize(c)
-	discussions, err := store.FromContext(c).GetDiscussionListUser(user.ID, page, size)
+	q := model.QueryParams {
+		"user_id": strconv.Itoa(int(user.ID)),
+	}
+	discussions, err := store.FromContext(c).GetDiscussionList(q, page, size)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
