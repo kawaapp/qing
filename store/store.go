@@ -17,25 +17,6 @@ const (
 	Comment
 )
 
-type Pager struct {
-	SinceId int64
-	Limit   int
-}
-
-type AdminStore interface {
-	// counter - user/active/discussion
-	GetTotalUser() (int, error)
-	GetNewUser(day time.Time) (int, error)
-	GetNewUserDaily(from, to time.Time) ([]*model.DailyCount, error)
-
-	GetUserActive(day time.Time) (int, error)
-	GetUserActiveDaily(from, to time.Time) ([]*model.DailyCount, error)
-
-	GetTotalDiscussion() (int, error)
-	GetNewDiscussion(day time.Time) (int, error)
-	GetNewDiscussionDaily(from, to time.Time) ([]*model.DailyCount, error)
-}
-
 type UserStore interface {
 	GetUserList(params model.QueryParams, page, size int) ([]*model.User, error)
 	GetUserCount(params model.QueryParams) (int, error)
@@ -60,6 +41,14 @@ type UserStore interface {
 	// user-exp-sign
 	UpdateUserExp(uid int64, exp int) error
 	UpdateUserSign(uid int64, count int) error
+
+	// analytics
+	GetTotalUser() (int, error)
+	GetNewUser(day time.Time) (int, error)
+	GetNewUserDaily(from, to time.Time) ([]*model.DailyCount, error)
+
+	GetUserActive(day time.Time) (int, error)
+	GetUserActiveDaily(from, to time.Time) ([]*model.DailyCount, error)
 }
 
 type DiscussionStore interface {
@@ -71,6 +60,11 @@ type DiscussionStore interface {
 	CreateDiscussion(p *model.Discussion) error
 	UpdateDiscussion(p *model.Discussion) error
 	DeleteDiscussion(id int64) error
+
+	// analytics
+	GetTotalDiscussion() (int, error)
+	GetNewDiscussion(day time.Time) (int, error)
+	GetNewDiscussionDaily(from, to time.Time) ([]*model.DailyCount, error)
 }
 
 type PostStore interface {
@@ -149,8 +143,6 @@ type ReportStore interface {
 }
 
 type Store interface {
-	AdminStore
-
 	// user
 	UserStore
 
