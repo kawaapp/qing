@@ -16,7 +16,7 @@ func (db *datasource) GetUserList(params model.QueryParams, page, size int) ([]*
 
 func (db *datasource) GetUserCount(params model.QueryParams) (int, error) {
 	query, args := sqlUserQuery("SELECT COUNT(id)", params, 0, 0)
-	num, err := db.Count(query, args...)
+	num, err := Count(db, query, args...)
 	return num, err
 }
 

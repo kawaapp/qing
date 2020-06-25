@@ -16,7 +16,7 @@ func (db *datasource) GetDiscussionList(params model.QueryParams, page, size int
 
 func (db *datasource) GetDiscussionCount(params model.QueryParams) (int, error)  {
 	query, args := sqlDiscussionQuery("SELECT COUNT(id) ", params, 0, 0)
-	num, err := db.Count(query, args...)
+	num, err := Count(db, query, args...)
 	return num, err
 }
 

@@ -17,7 +17,7 @@ func (db *datasource) GetPostList(params model.QueryParams, page, size int) ([]*
 
 func (db *datasource) GetPostCount(params model.QueryParams) (int, error) {
 	query, args := sqlPostQuery("SELECT COUNT(*) ", params, 0, 0)
-	return db.Count(query, args...)
+	return Count(db, query, args...)
 }
 
 func (db *datasource) GetPostListUser(uid int64, page, size int) ([]*model.Post, error) {

@@ -34,13 +34,6 @@ type AdminStore interface {
 	GetTotalDiscussion() (int, error)
 	GetNewDiscussion(day time.Time) (int, error)
 	GetNewDiscussionDaily(from, to time.Time) ([]*model.DailyCount, error)
-
-
-	SearchReport(params model.QueryParams, page, size int) ([]*model.Report, error)
-	SearchReportCount(params model.QueryParams) (int, error)
-
-	SearchSignUser(page, size int) ([]*model.User, error)
-	SearchSignUserCount(page, size int) (int, error)
 }
 
 type UserStore interface {
@@ -147,6 +140,9 @@ type MediaStore interface {
 }
 
 type ReportStore interface {
+	GetReportList(q model.QueryParams, page, size int) ([]*model.Report, error)
+	GetReportCount(q model.QueryParams) (int, error)
+
 	CreateReport(rpt *model.Report) error
 	GetReport(id int64) (*model.Report, error)
 	UpdateReport(*model.Report) error
@@ -342,13 +338,4 @@ func GetDailyNewComment(c echo.Context, from, to time.Time) ([]*model.DailyCount
 
 func GetDailyNewFavor(c echo.Context, from, to time.Time) ([]*model.DailyCount, error)  {
 	return nil, nil
-}
-
-// search
-func SearchReport(c echo.Context, params model.QueryParams, page, size int) ([]*model.Report, error)  {
-	return FromContext(c).SearchReport(params, page, size)
-}
-
-func SearchReportCount(c echo.Context, params model.QueryParams) (int, error) {
-	return FromContext(c).SearchReportCount(params)
 }

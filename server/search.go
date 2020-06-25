@@ -79,13 +79,14 @@ func SearchReport(c echo.Context) error {
 		page, size = getPageSize(c)
 		params = getQueryParams(c)
 	)
-	reports, err := store.SearchReport(c, params, page, size)
+	db := store.FromContext(c)
+	reports, err := db.GetReportList(params, page, size)
 	if err != nil {
 		return err
 	}
 	p := makePayload(0, reports)
 	if page == 0 {
-		num, _ := store.SearchReportCount(c, params)
+		num, _ := db.GetReportCount(params)
 		p.Total = num
 	}
 	if includes(c, "user") {
@@ -95,16 +96,4 @@ func SearchReport(c echo.Context) error {
 		attachPostToReport(c, reports, p)
 	}
 	return c.JSON(200, p)
-}
-
-func SearchSignUser(c echo.Context) error {
-	var (
-		page = GetQueryIntValue(c.QueryParam("page"), 1)
-		size = GetQueryIntValue(c.QueryParam("size"), 30)
-	)
-	pager, err := store.FromContext(c).SearchSignUser(page, size)
-	if err != nil {
-		return err
-	}
-	return c.JSON(200, pager)
 }
