@@ -30,14 +30,6 @@ type UserStore interface {
 	// user-exp-sign
 	UpdateUserExp(uid int64, exp int) error
 	UpdateUserSign(uid int64, count int) error
-
-	// analytics
-	GetTotalUser() (int, error)
-	GetNewUser(day time.Time) (int, error)
-	GetNewUserDaily(from, to time.Time) ([]*model.DailyCount, error)
-
-	GetUserActive(day time.Time) (int, error)
-	GetUserActiveDaily(from, to time.Time) ([]*model.DailyCount, error)
 }
 
 type DiscussionStore interface {
@@ -49,11 +41,6 @@ type DiscussionStore interface {
 	CreateDiscussion(p *model.Discussion) error
 	UpdateDiscussion(p *model.Discussion) error
 	DeleteDiscussion(id int64) error
-
-	// analytics
-	GetTotalDiscussion() (int, error)
-	GetNewDiscussion(day time.Time) (int, error)
-	GetNewDiscussionDaily(from, to time.Time) ([]*model.DailyCount, error)
 }
 
 type PostStore interface {
@@ -131,6 +118,21 @@ type ReportStore interface {
 	UpdateReport(*model.Report) error
 }
 
+type AnalyseStore interface {
+	// analytics
+	GetTotalUser() (int, error)
+	GetNewUser(day time.Time) (int, error)
+	GetNewUserDaily(from, to time.Time) ([]*model.DailyCount, error)
+
+	GetUserActive(day time.Time) (int, error)
+	GetUserActiveDaily(from, to time.Time) ([]*model.DailyCount, error)
+
+	// analytics
+	GetTotalDiscussion() (int, error)
+	GetNewDiscussion(day time.Time) (int, error)
+	GetNewDiscussionDaily(from, to time.Time) ([]*model.DailyCount, error)
+}
+
 type Store interface {
 	// user
 	UserStore
@@ -158,6 +160,9 @@ type Store interface {
 
 	// report
 	ReportStore
+
+	// analytics
+	AnalyseStore
 }
 
 // user
