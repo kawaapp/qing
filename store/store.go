@@ -6,17 +6,6 @@ import (
 	"time"
 )
 
-// About entity type
-// 0 : post
-// 1 : comment
-
-type EntityType int
-
-const (
-	Post EntityType = iota
-	Comment
-)
-
 type UserStore interface {
 	GetUserList(params model.QueryParams, page, size int) ([]*model.User, error)
 	GetUserCount(params model.QueryParams) (int, error)
