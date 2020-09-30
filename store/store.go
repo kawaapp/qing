@@ -69,6 +69,14 @@ type LikeStore interface {
 	GetLikePostList(uid int64, pids []int64) ([]int64, error)
 }
 
+type CategoryStore interface {
+	GetCategoryList() ([]*model.Category, error)
+	GetCategory(int64) (*model.Category, error)
+	CreateCategory(*model.Category) error
+	UpdateCategory(*model.Category) error
+	DeleteCategory(int64) error
+}
+
 type TagStore interface {
 	GetDiscussionsByTag(tag string, page, size int) ([]*model.Discussion, error)
 	GetTagList() ([]*model.Tag, error)

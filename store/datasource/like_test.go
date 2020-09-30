@@ -1,9 +1,7 @@
 package datasource
 
 import (
-	"github.com/russross/meddler"
 	"github.com/kawaapp/kawaqing/model"
-	"github.com/kawaapp/kawaqing/store"
 	"testing"
 	"math"
 )
@@ -100,12 +98,6 @@ func TestGetLikeListUser(t *testing.T) {
 	if sz := len(favors); sz != 2 {
 		t.Error("likes size, expect:", 2, "get:", sz)
 	}
-}
-
-func (db *datasource) getFavorById(uid, entity int64, ty store.EntityType) (*model.Like, error) {
-	get := &model.Like{}
-	err := meddler.QueryRow(db, get, "SELECT status from favors WHERE author_id=? AND entity_id=? AND entity_type=?", uid, entity, ty)
-	return get, err
 }
 
 func beforeLike() *datasource {

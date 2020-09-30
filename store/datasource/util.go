@@ -38,3 +38,8 @@ func Count(db *datasource, stmt string, args ...interface{}) (int, error) {
 	err := rows.Scan(&count)
 	return count, err
 }
+
+func Delete(db *datasource, stmt string, args ...interface{}) error {
+	_, err := db.Exec(stmt, args...)
+	return err
+}

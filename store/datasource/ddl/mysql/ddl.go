@@ -51,6 +51,7 @@ var index = []string{
 	createTableDiscussions,
 	createTablePosts,
 	createTableLikes,
+	createTableCategory,
 	createTableTags,
 	createTableTagRel,
 	createTableNotifications,
@@ -166,6 +167,7 @@ title 		VARCHAR(255),
 content 	TEXT,
 status 		INTEGER,
 author_id 	INTEGER,
+cate_id     INTEGER,
 
 first_post    INTEGER,
 last_post     INTEGER,
@@ -212,6 +214,21 @@ text 		VARCHAR(200),
 summary 	TEXT,
 
 UNIQUE(text)
+);`
+
+const createTableCategory = `
+CREATE TABLE IF NOT EXISTS categories (
+id INTEGER PRIMARY KEY AUTO_INCREMENT,
+created_at  INTEGER,
+updated_at  INTEGER,
+
+parent_id   INTEGER,
+_order      INTEGER,
+post_count  INTEGER,
+text        VARCHAR(255),
+image       VARCHAR(255),
+
+UNIQUE(parent_id, text)
 );`
 
 const createTableTagRel = `

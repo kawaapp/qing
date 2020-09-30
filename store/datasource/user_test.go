@@ -231,54 +231,6 @@ func TestGetUserByIds_Empty(t *testing.T) {
 	}
 }
 
-func TestGetUserListSign(t *testing.T) {
-	s := beforeUser()
-	defer s.Close()
-
-	users := []model.User {
-		{
-			Nickname: "Hello",
-			SignCount: 2,
-			Login: "1",
-		},
-		{
-			Nickname: "World",
-			SignCount: 1,
-			Login: "2",
-		},
-		{
-			Nickname: "Foo",
-			SignCount: 3,
-			Login: "3",
-		},
-		{
-			Nickname: "Bar",
-			SignCount: 0,
-			Login: "4",
-		},
-		{
-			Nickname: "",
-			SignCount: 0,
-			Login: "5",
-		},
-	}
-	if err := createUserList(s, users); err != nil {
-		t.Fatal(err)
-	}
-
-	// by page/szie
-	gets, err := s.GetUserListSign(1, 100)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(gets) != 4 {
-		t.Fatal("sign user list size err, expect:", 4, "get:", len(gets))
-	}
-	if gets[0].SignCount <= gets[1].SignCount || gets[1].SignCount <= gets[2].SignCount {
-		t.Fatal("sign user list not ranked desc!")
-	}
-}
-
 func TestUpdateUserSign(t *testing.T) {
 	s := beforeUser()
 	defer s.Close()

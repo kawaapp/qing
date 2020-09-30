@@ -10,6 +10,9 @@ type Discussion struct {
 	Content  string `json:"content" meddler:"content"`
 	AuthorID int64  `json:"author_id" meddler:"author_id"`
 
+	// category
+	CategoryID int64 `json:"cate_id" meddler:"cate_id"`
+
 	// Add+
 	FirstPost    int64 `json:"first_post" meddler:"first_post"`
 	LastPost     int64 `json:"last_post" meddler:"last_post"`

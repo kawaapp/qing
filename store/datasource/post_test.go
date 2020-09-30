@@ -51,7 +51,7 @@ func TestPostList(t *testing.T) {
 	s.CreatePost(&p1)
 	s.CreatePost(&p2)
 
-	posts, err := s.GetPostList(pid, 0, math.MaxInt64)
+	posts, err := s.GetPostList(nil, 0, 100)
 	if err != nil {
 		t.Error(err)
 	}
@@ -106,7 +106,10 @@ func TestPostPager(t *testing.T) {
 		s.CreatePost(&c)
 	}
 
-	comments, err := s.GetPostList(1, 0, 10)
+	q := model.QueryParams{
+		"did": "1",
+	}
+	comments, err := s.GetPostList(q, 0, 10)
 	if err != nil {
 		t.Error(err)
 	}

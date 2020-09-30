@@ -64,10 +64,10 @@ func TestTransact_Panic(t *testing.T) {
 		if r := recover(); r != nil {
 			log.Println("recover from panic", r)
 		}
-		if n, err := s.Count("SELECT * FROM users"); n != 0 || err != sql.ErrNoRows {
+		if n, err := Count(s,"SELECT * FROM users"); n != 0 || err != sql.ErrNoRows {
 			t.Error("user should not exist!", err)
 		}
-		if n, err := s.Count("SELECT * FROM posts"); n != 0 || err != sql.ErrNoRows {
+		if n, err := Count(s,"SELECT * FROM posts"); n != 0 || err != sql.ErrNoRows {
 			t.Error("post should not exist!", err)
 		}
 	}()
@@ -99,10 +99,10 @@ func TestTransact_Error(t *testing.T) {
 	}
 
 	defer func() {
-		if n, err := s.Count("SELECT * FROM users"); n != 0 || err != sql.ErrNoRows {
+		if n, err := Count(s,"SELECT * FROM users"); n != 0 || err != sql.ErrNoRows {
 			t.Error("user should not exist!", err)
 		}
-		if n, err := s.Count("SELECT * FROM posts"); n != 0 || err != sql.ErrNoRows {
+		if n, err := Count(s,"SELECT * FROM posts"); n != 0 || err != sql.ErrNoRows {
 			t.Error("post should not exist!", err)
 		}
 	}()
