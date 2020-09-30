@@ -36,7 +36,7 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 		get.GET("/discussions/:id", server.GetDiscussion)
 
 		// posts
-		get.GET("/discussions/:pid/posts", server.GetPostList)
+		get.GET("/discussions/:did/posts", server.GetPostList)
 		get.GET("/discussions/posts/:id", server.GetPost)
 
 		// likes

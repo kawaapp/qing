@@ -92,6 +92,11 @@ func sqlPostQuery(queryBase string, params model.QueryParams, page, size int) (q
 		args = append(args, q)
 	}
 
+	if q, ok := params["did"]; ok {
+		where += " AND discussion_id=?"
+		args = append(args, q)
+	}
+
 	if len(where) > 0 {
 		query += " WHERE 1=1" + where
 	}

@@ -72,7 +72,7 @@ func GetUser(c echo.Context) error {
 	if u, err := store.GetUser(c, int64(id)); err != nil {
 		return c.NoContent(404)
 	} else {
-		return c.JSON(200, u)
+		return jsonResp(c, 0, u)
 	}
 }
 

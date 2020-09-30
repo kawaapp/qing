@@ -34,6 +34,14 @@ func errPayload(code int, err error) payload {
 	}
 }
 
+func jsonResp(c echo.Context, code int, data interface{}) error {
+	return c.JSON(200, makePayload(code, data))
+}
+
+func errorResp(c echo.Context, code int, err error) error {
+	return c.JSON(200, errPayload(code, err))
+}
+
 func includes(c echo.Context, name string) bool {
 	return strings.Contains(c.QueryParam("includes"), name)
 }

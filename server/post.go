@@ -19,14 +19,14 @@ import (
 // user - api
 
 func GetPostList(c echo.Context) error {
-	pid, err := strconv.Atoi(c.Param("pid"))
+	pid, err := strconv.Atoi(c.Param("did"))
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 	page, size := getPageSize(c)
 
 	q := model.QueryParams{
-		"pid" : strconv.Itoa(pid),
+		"did" : strconv.Itoa(pid),
 	}
 	posts, err := store.FromContext(c).GetPostList(q, page, size)
 	if err != nil {
