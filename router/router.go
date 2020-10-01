@@ -43,6 +43,10 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 		get.GET("/posts/:id/likes", server.GetLikeList)
 		get.GET("/posts/:id/likes/count", server.GetLikeCount)
 
+		// category
+		get.GET("/categories", server.GetCategoryList)
+		get.GET("/categories/:id", server.GetCategory)
+
 		// tags
 		get.GET("/tags/:tag/discussions", server.GetDiscussionsByTag)
 		get.GET("/tags", server.GetTagList)
@@ -112,6 +116,13 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 		admin.GET("/posts/search", server.SearchPosts)
 		admin.DELETE("/posts/:id", server.DeletePost)
 		admin.POST("/posts", server.CreatePost)
+
+		// category
+		admin.GET("/categories", server.GetCategoryList)
+		admin.GET("/categories/:id", server.GetCategory)
+		admin.POST("/categories", server.CreateCategory)
+		admin.PUT("/categories/:id", server.UpdateCategory)
+		admin.DELETE("/categories/:id", server.DeleteCategory)
 
 		// topic (it's hash tag)
 		admin.GET("/tags", server.GetTagList)

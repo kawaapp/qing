@@ -6,7 +6,10 @@ import (
 )
 
 func (db *datasource) GetCategoryList() ([]*model.Category, error) {
-	return nil, nil
+	query := "SELECT * FROM categories ORDER BY _order ASC, id DESC"
+	arr := make([]*model.Category, 0)
+	err := meddler.QueryAll(db, &arr, query)
+	return arr, err
 }
 
 func (db *datasource) GetCategory(id int64) (*model.Category, error) {

@@ -154,6 +154,9 @@ type Store interface {
 	// like
 	LikeStore
 
+	// category
+	CategoryStore
+
 	// tag
 	TagStore
 
