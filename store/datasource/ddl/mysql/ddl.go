@@ -195,10 +195,11 @@ id INTEGER PRIMARY KEY AUTO_INCREMENT,
 created_at  INTEGER,
 
 status 		INTEGER,
-author_id 	INTEGER,
-post_id 	INTEGER,
+user_id 	INTEGER,
+target_id   INTEGER,
+target_ty 	CHAR(12),
 
-UNIQUE(author_id, post_id)
+UNIQUE(user_id, target_ty, target_id)
 );`
 
 const createTableTags = `

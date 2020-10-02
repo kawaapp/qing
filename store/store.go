@@ -57,14 +57,14 @@ type PostStore interface {
 }
 
 type LikeStore interface {
-	GetLikeList(pid int64, page, size int) ([]*model.Like, error)
-	GetLikeListUser(uid int64, page, size int) ([]*model.Like, error)
-	GetLikeCount(pid int64) (int, error)
-	GetLike(pid, uid int64) (*model.Like, error)
+	GetLikeList(q model.QueryParams, page, size int) ([]*model.Like, error)
+	GetLikeCount(q model.QueryParams) (int, error)
+
+	GetLike(ty string, id, uid int64) (*model.Like, error)
 	GetLikeId(id int64) (*model.Like, error)
-	CreateLike(f *model.Like) error
-	UpdateLike(f *model.Like) error
-	DeleteLike(int64) error
+
+	CreateLike(t string, tid, uid int64) (error, bool)
+	DeleteLike(t string, tid, uid int64) error
 
 	GetLikePostList(uid int64, pids []int64) ([]int64, error)
 }
@@ -252,20 +252,24 @@ func DeletePost(c echo.Context, id int64) error {
 }
 
 // like
-func GetLikeList(c echo.Context, pid int64, page, size int) ([]*model.Like, error) {
-	return FromContext(c).GetLikeList(pid, page, size)
+func GetLikeList(c echo.Context, q model.QueryParams, page, size int) ([]*model.Like, error) {
+	return FromContext(c).GetLikeList(q, page, size)
 }
 
-func GetFavorCount(c echo.Context, pid int64) (int, error) {
-	return FromContext(c).GetLikeCount(pid)
+func GetLikeCount(c echo.Context, q model.QueryParams) (int, error) {
+	return FromContext(c).GetLikeCount(q)
 }
 
-func CreateFavor(c echo.Context, f *model.Like) error {
-	return FromContext(c).CreateLike(f)
+func GetLike(c echo.Context, t string, tid, uid int64) (*model.Like, error) {
+	return FromContext(c).GetLike(t, tid, uid)
 }
 
-func DeleteFavor(c echo.Context, id int64) error {
-	return FromContext(c).DeleteLike(id)
+func CreateLike(c echo.Context, t string, tid, uid int64) (error,bool) {
+	return FromContext(c).CreateLike(t, tid, uid)
+}
+
+func DeleteLike(c echo.Context, t string, tid, uid int64) error {
+	return FromContext(c).DeleteLike(t, tid, uid)
 }
 
 // tags

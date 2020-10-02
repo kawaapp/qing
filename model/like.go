@@ -1,5 +1,10 @@
 package model
 
+const (
+	LikePost = "post"
+	LikeDiscussion = "dz"
+)
+
 type Like struct {
 	ID        int64 `json:"id" meddler:"id,pk"`
 	CreatedAt int64 `json:"created_at" meddler:"created_at"`
@@ -8,8 +13,11 @@ type Like struct {
 	Status int64 `json:"status" meddler:"status"`
 
 	// Who clicks the like button
-	AuthorID int64 `json:"-" meddler:"author_id"`
+	UserID int64 `json:"user_id" meddler:"user_id"`
 
-	// Post is liked
-	PostId int64 `json:"-" meddler:"post_id"`
+	// Like type, post or discussion
+	TargetTy string `json:"target_ty" meddler:"target_ty"`
+
+	// Like target's id
+	TargetID int64 `json:"target_id" meddler:"target_id"`
 }

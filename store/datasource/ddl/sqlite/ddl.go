@@ -194,10 +194,11 @@ id INTEGER PRIMARY KEY AUTOINCREMENT,
 created_at INTEGER,
 
 status 		INTEGER,
-author_id 	INTEGER,
-post_id 	INTEGER,
+user_id 	INTEGER,
+target_id   INTEGER,
+target_ty 	TEXT,
 
-UNIQUE(author_id, post_id)
+UNIQUE(user_id, target_ty, target_id)
 );`
 
 const createTableCategory = `
