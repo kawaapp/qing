@@ -9,13 +9,13 @@ type Category struct {
 	ParentId  int64 `json:"parent_id" meddler:"parent_id"`
 
 	// 排序
-	Order     int   `json:"order" meddler:"_order"`
+	Sort     int   `json:"sort" meddler:"_sort"`
 
-	// 分类文字
-	Text      string `json:"text" meddler:"text"`
+	// 分类名称
+	Name      string `json:"name" meddler:"name"`
 
-	// 分类图片
-	Image     string `json:"image" meddler:"image"`
+	// 说明
+	Summary string `json:"summary" meddler:"summary"`
 
 	// 缓存帖子数量
 	PostCount int `json:"post_count" meddler:"post_count"`

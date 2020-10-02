@@ -11,7 +11,7 @@ func TestCreateCategory(t *testing.T)  {
 	defer s.Close()
 
 	ctg := &model.Category{
-		Text: "分类1",
+		Name: "分类1",
 	}
 	if err := s.CreateCategory(ctg); err != nil {
 		t.Fatal(err)
@@ -20,16 +20,16 @@ func TestCreateCategory(t *testing.T)  {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if get.Text != ctg.Text {
+	if get.Name != ctg.Name {
 		t.Fatal(err)
 	}
 
 	// update
-	ctg.Text = "分类2"
+	ctg.Name = "分类2"
 	if err := s.UpdateCategory(ctg); err != nil {
 		t.Fatal(err)
 	}
-	if get, _ := s.GetCategory(ctg.ID); get.Text != ctg.Text {
+	if get, _ := s.GetCategory(ctg.ID); get.Name != ctg.Name {
 		t.Fatal("UpdateCategory error, expect:", ctg, "get:", get)
 	}
 

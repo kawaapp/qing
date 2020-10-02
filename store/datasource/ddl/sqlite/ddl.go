@@ -207,13 +207,12 @@ created_at  INTEGER,
 updated_at  INTEGER,
 
 parent_id   INTEGER,
-_order      INTEGER,
+_sort       INTEGER,
 post_count  INTEGER,
+name        TEXT,
+summary     TEXT,
 
-text        TEXT,
-image       TEXT,
-
-UNIQUE(parent_id, text)
+UNIQUE(parent_id, name)
 );`
 
 const createTableTags = `

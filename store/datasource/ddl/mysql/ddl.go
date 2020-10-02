@@ -223,12 +223,12 @@ created_at  INTEGER,
 updated_at  INTEGER,
 
 parent_id   INTEGER,
-_order      INTEGER,
+_sort       INTEGER,
 post_count  INTEGER,
-text        VARCHAR(255),
-image       VARCHAR(255),
+name        VARCHAR(255),
+summary     VARCHAR(255),
 
-UNIQUE(parent_id, text)
+UNIQUE(parent_id, name)
 );`
 
 const createTableTagRel = `

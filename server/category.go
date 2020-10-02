@@ -59,14 +59,14 @@ func UpdateCategory(c echo.Context) error {
 	in := (map[string]interface{})(m)
 
 	// partial update
-	if v, ok := in["text"]; ok {
-		ctg.Text = v.(string)
+	if v, ok := in["name"]; ok {
+		ctg.Name = v.(string)
 	}
-	if v, ok := in["image"]; ok {
-		ctg.Image = v.(string)
+	if v, ok := in["summary"]; ok {
+		ctg.Summary = v.(string)
 	}
-	if v, ok := in["order"]; ok {
-		ctg.Order = int(v.(float64))
+	if v, ok := in["sort"]; ok {
+		ctg.Sort = int(v.(float64))
 	}
 	if v, ok := in["parent_id"]; ok {
 		ctg.ParentId = int64(v.(float64))
