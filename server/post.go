@@ -97,7 +97,7 @@ func CreatePost(c echo.Context) error {
 	// publish comment message
 	events.Dispatch(ePostCreated, c, post)
 
-	return c.JSON(200, post)
+	return jsonResp(c, 0, post)
 }
 
 func UpdatePost(c echo.Context) error {

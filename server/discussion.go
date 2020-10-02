@@ -42,6 +42,10 @@ func GetDiscussionList(c echo.Context) error {
 	q := model.QueryParams{
 		"filter": filter,
 	}
+	if cid := c.QueryParam("cate_id"); len(cid) > 0 {
+		q["cate_id"] = cid
+	}
+
 	discussions, err := db.GetDiscussionList(q, page, size)
 	if err != nil {
 		return err

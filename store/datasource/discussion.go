@@ -75,10 +75,12 @@ func sqlDiscussionQuery(queryBase string, params model.QueryParams, page, size i
 		where += " AND content LIKE ?"
 		args = append(args, "%" + q + "%")
 	}
-
-	// TODO JOIN!
-	if q, ok := params["author"]; ok {
-		where += " AND author_id IN (SELECT id FROM users WHERE nickname=?)"
+	if q, ok := params["author_id"]; ok {
+		where += " AND author_id = ?"
+		args = append(args, q)
+	}
+	if q, ok := params["cate_id"]; ok {
+		where += " AND cate_id = ?"
 		args = append(args, q)
 	}
 
