@@ -94,10 +94,28 @@ func sqlDiscussionQuery(queryBase string, params model.QueryParams, page, size i
 		query += " WHERE 1=1" + where
 	}
 
+	// get sort method
+	sort := getSort(params["sort"])
+
 	if size > 0 {
-		query += fmt.Sprintf(" ORDER BY id DESC LIMIT %d OFFSET %d", size, page * size)
+		query += fmt.Sprintf(" ORDER BY %s LIMIT %d OFFSET %d", sort, size, page * size)
 	}
 	return
+}
+
+func getSort(sort string) string {
+	switch sort {
+	case "", "last":
+		return "id DESC"
+	case "valued":
+		return "status DESC, id DESC"
+	case "no_reply":
+		return "comment_count ASC, id DESC"
+	case "last_reply":
+		return "last_reply_at DESC, id DESC"
+	default:
+		return "id DESC"
+	}
 }
 
 const sqlListPostByIds = sqlDiscussionSelect +`

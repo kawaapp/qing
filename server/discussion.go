@@ -269,12 +269,13 @@ func GetDiscussionByUser(c echo.Context) error {
 }
 
 func attachUserToDiscussion(c echo.Context, posts []*model.Discussion, p payload) {
-	ids := make([]int64, len(posts))
+	ids := make([]int64, len(posts) * 2)
 	kv := make(map[int64]*model.User)
 
 	// attach user info
 	for i, v := range posts {
-		ids[i] = v.AuthorID
+		ids[i<<1+0] = v.AuthorID
+		ids[i<<1+1] = v.LastReplyUid
 	}
 
 	// 返回的user-id可能会比post少，sql查询是去重的结果
@@ -337,7 +338,10 @@ func dzOnCommentChanged(c echo.Context, v interface{}, getCount func(num int) in
 		d.LastReplyUid = p.AuthorID
 	}
 	err = store.FromContext(c).UpdateDiscussion(d)
-	return fmt.Errorf("dzOnCommentChanged, %v", err)
+	if err != nil {
+		return fmt.Errorf("dzOnCommentChanged, %v", err)
+	}
+	return nil
 }
 
 func dzOnCommentCreated(c echo.Context, v interface{}) error  {
@@ -378,7 +382,10 @@ func dzOnLikeChanged(c echo.Context, v interface{}, getCount func(base int) int)
 	}
 	d.LikeCount = getCount(d.LikeCount)
 	err = store.UpdateDiscussion(c, d)
-	return fmt.Errorf("dzOnLikeChanged, %v", err)
+	if err != nil {
+		return fmt.Errorf("dzOnLikeChanged, %v", err)
+	}
+	return nil
 }
 
 func init() {
