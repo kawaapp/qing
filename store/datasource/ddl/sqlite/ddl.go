@@ -171,7 +171,9 @@ cate_id     INTEGER,
 
 first_post    INTEGER,
 last_post     INTEGER,
-comment_count INTEGER
+comment_count INTEGER,
+view_count    INTEGER,
+like_count    INTEGER
 );`
 
 const createTablePosts = `

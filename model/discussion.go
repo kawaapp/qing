@@ -17,4 +17,7 @@ type Discussion struct {
 	FirstPost    int64 `json:"first_post" meddler:"first_post"`
 	LastPost     int64 `json:"last_post" meddler:"last_post"`
 	CommentCount int   `json:"comment_count" meddler:"comment_count"`
+
+	LikeCount    int   `json:"like_count" meddler:"like_count"`
+	ViewCount    int   `json:"view_count" meddler:"view_count"`
 }

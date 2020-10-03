@@ -63,7 +63,9 @@ SELECT
 
 	first_post,
 	last_post,
-	comment_count
+	comment_count,
+	view_count,
+	like_count
 `
 
 func sqlDiscussionQuery(queryBase string, params model.QueryParams, page, size int) (query string, args []interface{}) {
