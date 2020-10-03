@@ -40,13 +40,13 @@ func (in *discussion) validate() error  {
 // user - api
 func GetDiscussionList(c echo.Context) error {
 	var (
-		filter = c.FormValue("filter")
+		sort = c.QueryParam("q")
 		//sort   = c.FormValue("sort")
 		page, size = getPageSize(c)
 	)
 	db := store.FromContext(c)
 	q := model.QueryParams{
-		"filter": filter,
+		"sort": sort,
 	}
 	if cid := c.QueryParam("cate_id"); len(cid) > 0 {
 		q["cate_id"] = cid
@@ -323,17 +323,21 @@ func SetDiscussionStatus(c echo.Context) error {
 
 // events
 func dzOnCommentChanged(c echo.Context, v interface{}, getCount func(num int) int) error {
-	comment, ok := v.(*model.Post)
+	p, ok := v.(*model.Post)
 	if !ok {
-		return typeError("Comment")
+		return typeError("Post")
 	}
-	d, err := store.FromContext(c).GetDiscussion(comment.DiscussionID)
+	d, err := store.FromContext(c).GetDiscussion(p.DiscussionID)
 	if err != nil {
 		return err
 	}
-	d.CommentCount = getCount(d.CommentCount)
+	{
+		d.CommentCount = getCount(d.CommentCount)
+		d.LastReplyAt = p.CreatedAt
+		d.LastReplyUid = p.AuthorID
+	}
 	err = store.FromContext(c).UpdateDiscussion(d)
-	return err
+	return fmt.Errorf("dzOnCommentChanged, %v", err)
 }
 
 func dzOnCommentCreated(c echo.Context, v interface{}) error  {
@@ -373,7 +377,8 @@ func dzOnLikeChanged(c echo.Context, v interface{}, getCount func(base int) int)
 		return err
 	}
 	d.LikeCount = getCount(d.LikeCount)
-	return store.UpdateDiscussion(c, d)
+	err = store.UpdateDiscussion(c, d)
+	return fmt.Errorf("dzOnLikeChanged, %v", err)
 }
 
 func init() {
