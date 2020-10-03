@@ -25,6 +25,8 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 	// api - user
 	get := e.Group("/api")
 	{
+		get.Use(session.OptUser())
+
 		// user
 		get.GET("/users/:id", server.GetUser)
 		get.GET("/users/:id/discussions", server.GetDiscussionByUser)

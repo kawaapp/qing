@@ -62,3 +62,25 @@ func AttachUser() echo.MiddlewareFunc {
 		}
 	}
 }
+
+// Optional user
+func OptUser() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			var (
+				user *model.User
+				inner error
+			)
+			token.ParseRequest(c, func(t *token.Token) (string, error) {
+				user, inner = store.GetUserLogin(c, t.Text)
+				return user.Hash, inner
+			})
+			if user != nil {
+				c.Set(userKey, user)
+				// emit event - user login
+				events.Dispatch("user.login", c, user)
+			}
+			return next(c)
+		}
+	}
+}

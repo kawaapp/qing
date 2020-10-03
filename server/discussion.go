@@ -13,12 +13,18 @@ import (
 	"strconv"
 	"database/sql"
 	"strings"
+	"log"
 )
 
 // discussion
 type discussion struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
+}
+
+type outDiscussion struct {
+	*model.Discussion
+	Liked bool `json:"liked"`
 }
 
 func (in *discussion) validate() error  {
@@ -69,8 +75,11 @@ func GetDiscussion(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 	discussion, err := store.GetDiscussion(c, int64(id))
-	if err != nil {
+	if err == sql.ErrNoRows {
 		return c.NoContent(404)
+	}
+	if err != nil {
+		return fmt.Errorf("GetDiscussion, %v", err)
 	}
 
 	p := makePayload(0, discussion)
@@ -79,7 +88,35 @@ func GetDiscussion(c echo.Context) error {
 	if includes(c, "user") {
 		attachUserToDiscussion(c, []*model.Discussion{ discussion }, p)
 	}
-	return c.JSON(200, p)
+
+	// get user like state
+	var (
+		liked = false
+	)
+
+	// optional user
+	if usr := session.User(c); usr != nil {
+		_, err := store.GetLike(c, "dz", int64(id), usr.ID)
+		if err == nil {
+			liked = true
+		}
+	}
+
+	go increaseViewCount(c, discussion)
+
+	// with extra state
+	out := outDiscussion{
+		Discussion: discussion, Liked: liked,
+	}
+	return jsonResp(c, 0, out)
+}
+
+func increaseViewCount(c echo.Context, d *model.Discussion) {
+	d.ViewCount += 1
+	err := store.UpdateDiscussion(c, d)
+	if err != nil {
+		log.Printf("increaseViewCount, %v", err)
+	}
 }
 
 func CreateDiscussion(c echo.Context) error {
@@ -298,20 +335,49 @@ func dzOnCommentChanged(c echo.Context, v interface{}, getCount func(num int) in
 	return err
 }
 
-func postOnCommentCreated(c echo.Context, v interface{}) error  {
+func dzOnCommentCreated(c echo.Context, v interface{}) error  {
 	return dzOnCommentChanged(c, v, func(num int) int {
 		return num + 1
 	})
 }
 
-func postOnCommentDeleted(c echo.Context, v interface{}) error  {
+func dzOnCommentDeleted(c echo.Context, v interface{}) error  {
 	return dzOnCommentChanged(c, v, func(num int) int {
 		return Max(num -1, 0)
 	})
 }
 
+func dzOnLikeCreated(c echo.Context, v interface{}) error {
+	return dzOnLikeChanged(c, v, func(base int) int {
+		return base + 1
+	})
+}
+
+func dzOnLikeDeleted(c echo.Context, v interface{}) error {
+	return dzOnLikeChanged(c, v, func(base int) int {
+		return Max(base-1, 0)
+	})
+}
+
+func dzOnLikeChanged(c echo.Context, v interface{}, getCount func(base int) int) error {
+	like, ok := v.(*model.Like)
+	if !ok {
+		return typeError("Like")
+	}
+	if like.TargetTy != model.LikeDiscussion {
+		return nil  // skip if not dz
+	}
+	d, err := store.GetDiscussion(c, like.TargetID)
+	if err != nil {
+		return err
+	}
+	d.LikeCount = getCount(d.LikeCount)
+	return store.UpdateDiscussion(c, d)
+}
 
 func init() {
-	events.Subscribe(ePostCreated, postOnCommentCreated)
-	events.Subscribe(ePostDeleted, postOnCommentDeleted)
+	events.Subscribe(ePostCreated, dzOnCommentCreated)
+	events.Subscribe(ePostDeleted, dzOnCommentDeleted)
+	events.Subscribe(eLikeCreated, dzOnLikeCreated)
+	events.Subscribe(eLikeDeleted, dzOnLikeDeleted)
 }
