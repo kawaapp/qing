@@ -13,6 +13,8 @@ type Discussion struct {
 	// category
 	CategoryID int64 `json:"cate_id" meddler:"cate_id"`
 
+	Status int  `json:"status" meddler:"status"`
+
 	// Add+
 	FirstPost    int64 `json:"first_post" meddler:"first_post"`
 	LastPost     int64 `json:"last_post" meddler:"last_post"`
