@@ -11,12 +11,9 @@ import (
 	"net/http"
 	"strconv"
 	"database/sql"
+	"log"
 )
 
-// comment/reply
-
-
-// user - api
 
 func GetPostList(c echo.Context) error {
 	pid, err := strconv.Atoi(c.Param("did"))
@@ -220,11 +217,12 @@ func attachLikeToPost(c echo.Context, posts []*model.Post, p payload) {
 		uid = user.ID
 	}
 
-	favors, _ := store.FromContext(c).GetLikePostList(uid, ids)
-	if len(favors) > 0 {
-		for _, v := range favors {
-			kv[v] = v
-		}
+	likes, err := store.FromContext(c).GetUserLikedPostList(uid, ids)
+	if err != nil {
+		log.Printf("attachLikeToPost, %v", err)
+	}
+	for _, v := range likes {
+		kv[v] = v
 	}
 	p.Entities["likes"] = kv
 }

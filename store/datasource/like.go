@@ -23,11 +23,11 @@ func (db *datasource) GetLikeCount(q model.QueryParams) (int, error) {
 	return count, err
 }
 
-func (db *datasource) GetLikePostList(uid int64, pids []int64) ([]int64, error) {
+func (db *datasource) GetUserLikedPostList(uid int64, pids []int64) ([]int64, error) {
 	data := make([]int64, len(pids))
 
 	q := joinIntArray(pids)
-	stmt := fmt.Sprintf(sqlLikedPostList, q)
+	stmt := fmt.Sprintf(sqlUserLikedPostList, q)
 	rows, err := db.Query(stmt, uid, model.LikePost)
 	if err != nil {
 		return nil, err
@@ -150,8 +150,8 @@ func sqlGetLikeList(queryBase string, q model.QueryParams, page, size int) (quer
 	return
 }
 
-const sqlLikedPostList = `
-SELECT post_id
+const sqlUserLikedPostList = `
+SELECT target_id
 FROM likes
-WHERE post_id in(%s) AND author_id=? AND target_ty=? AND status=1
+WHERE target_id in(%s) AND user_id=? AND target_ty=? AND status=1
 `

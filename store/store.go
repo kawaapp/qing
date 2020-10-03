@@ -66,7 +66,8 @@ type LikeStore interface {
 	CreateLike(t string, tid, uid int64) (error, bool)
 	DeleteLike(t string, tid, uid int64) error
 
-	GetLikePostList(uid int64, pids []int64) ([]int64, error)
+	// 从数组中过滤用户赞过的Post
+	GetUserLikedPostList(uid int64, pids []int64) ([]int64, error)
 }
 
 type CategoryStore interface {

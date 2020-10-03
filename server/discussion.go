@@ -82,12 +82,8 @@ func GetDiscussion(c echo.Context) error {
 		return fmt.Errorf("GetDiscussion, %v", err)
 	}
 
-	p := makePayload(0, discussion)
-
-	// attach users
-	if includes(c, "user") {
-		attachUserToDiscussion(c, []*model.Discussion{ discussion }, p)
-	}
+	// increase counter
+	go increaseViewCount(c, discussion)
 
 	// get user like state
 	var (
@@ -102,13 +98,18 @@ func GetDiscussion(c echo.Context) error {
 		}
 	}
 
-	go increaseViewCount(c, discussion)
-
 	// with extra state
 	out := outDiscussion{
 		Discussion: discussion, Liked: liked,
 	}
-	return jsonResp(c, 0, out)
+
+	p := makePayload(0, out)
+
+	// attach users
+	if includes(c, "user") {
+		attachUserToDiscussion(c, []*model.Discussion{ discussion }, p)
+	}
+	return c.JSON(200, p)
 }
 
 func increaseViewCount(c echo.Context, d *model.Discussion) {
