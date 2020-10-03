@@ -9,7 +9,7 @@ import (
 // posts
 func (db *datasource) GetDiscussionList(params model.QueryParams, page, size int) ([]*model.Discussion, error) {
 	data := make([]*model.Discussion, 0)
-	query, args := sqlDiscussionQuery("SELECT * ", params, page, size)
+	query, args := sqlDiscussionQuery(sqlDiscussionSelect, params, page, size)
 	err := meddler.QueryAll(db, &data, query, args...)
 	return data, err
 }
@@ -56,13 +56,17 @@ const sqlDiscussionSelect = `
 SELECT
 	id,
 	created_at,
+	updated_at,
 
 	title,
 	content,
+	status,
+	cate_id,
 	author_id,
 
-	first_post,
-	last_post,
+	last_reply_uid,
+	last_reply_at,
+
 	comment_count,
 	view_count,
 	like_count

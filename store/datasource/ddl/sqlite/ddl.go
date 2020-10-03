@@ -169,8 +169,9 @@ content 	TEXT,
 author_id 	INTEGER,
 cate_id     INTEGER,
 
-first_post    INTEGER,
-last_post     INTEGER,
+last_reply_uid INTEGER,
+last_reply_at  INTEGER,
+
 comment_count INTEGER,
 view_count    INTEGER,
 like_count    INTEGER
