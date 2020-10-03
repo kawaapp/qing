@@ -86,6 +86,13 @@ func CreatePost(c echo.Context) error {
 		}
 	}
 
+	// get replier id from parent.author.id
+	if post.ParentID > 0 {
+		if pp, err := store.GetPost(c, post.ParentID); err == nil {
+			post.ReplyID = pp.AuthorID
+		}
+	}
+
 	// insert db
 	if err := store.CreatePost(c, post); err != nil {
 		return err
