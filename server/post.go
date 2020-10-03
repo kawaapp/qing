@@ -231,17 +231,17 @@ func attachLikeToPost(c echo.Context, posts []*model.Post, p payload) {
 
 // events
 func postOnLikeChanged(c echo.Context, v interface{}, getCount func(f *model.Like, num int) int) error {
-	favor, ok := v.(*model.Like)
+	like, ok := v.(*model.Like)
 	if !ok {
 		return typeError("Favor")
 	}
 
-	cmt, err := store.FromContext(c).GetPost(favor.PostId)
+	p, err := store.GetPost(c, like.TargetID)
 	if err != nil {
 		return err
 	}
-	cmt.LikeCount = getCount(favor, cmt.LikeCount)
-	err = store.UpdatePost(c, cmt)
+	p.LikeCount = getCount(like, p.LikeCount)
+	err = store.UpdatePost(c, p)
 	return err
 }
 
@@ -263,5 +263,5 @@ func postOnLikeUpdated(c echo.Context, v interface{}) error {
 
 func init() {
 	events.Subscribe(eLikeCreated, postOnLikeCreated)
-	events.Subscribe(eLikeUpdated, postOnLikeUpdated)
+	events.Subscribe(eLikeDeleted, postOnLikeUpdated)
 }

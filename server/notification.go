@@ -129,10 +129,10 @@ func msgOnCommentDeleted(c echo.Context, v interface{}) error {
 func msgOnLikeCreated(c echo.Context, v interface{}) error {
 	f, ok := v.(*model.Like)
 	if !ok {
-		return typeError("Favor")
+		return typeError("Like")
 	}
 
-	p, err := store.GetPost(c, f.PostId)
+	toId, err := getLikedUser(c, f)
 	if err != nil {
 		return err
 	}
@@ -140,8 +140,8 @@ func msgOnLikeCreated(c echo.Context, v interface{}) error {
 	n := &model.Notification {
 		EntityId: f.ID,
 		EntityType: int(model.NotLike),
-		FromId: f.AuthorID,
-		ToId: p.AuthorID,
+		FromId: f.UserID,
+		ToId: toId,
 	}
 	return store.CreateNotification(c, n)
 }
@@ -149,6 +149,22 @@ func msgOnLikeCreated(c echo.Context, v interface{}) error {
 //
 func msgOnLikeUpdated(c echo.Context, v interface{}) error {
 	return nil
+}
+
+func getLikedUser(c echo.Context, l *model.Like) (int64, error) {
+	if l.TargetTy == model.LikeDiscussion {
+		d, err := store.GetDiscussion(c, l.TargetID)
+		if err != nil {
+			return 0, err
+		}
+		return d.AuthorID, nil
+	} else {
+		p, err := store.GetPost(c, l.TargetID)
+		if err != nil {
+			return 0, err
+		}
+		return p.AuthorID, nil
+	}
 }
 
 func init() {

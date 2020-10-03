@@ -9,29 +9,56 @@ import (
 
 	"net/http"
 	"strconv"
-	"database/sql"
+	"fmt"
 )
 
 // likes
-func GetLikeList(c echo.Context) error {
-	cid, err := strconv.Atoi(c.Param("id"))
+func GetDiscussionLikeList(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.String(http.StatusBadRequest, "id not found")
 	}
-	return getFavorList(c, int64(cid))
+	page, size := getPageSize(c)
+	q := model.QueryParams{
+		"target_ty": model.LikeDiscussion,
+		"target_id": strconv.Itoa(id),
+	}
+	likes, err := store.GetLikeList(c, q, page, size)
+	if err != nil {
+		return fmt.Errorf("GetDiscussionLikeList, %v", err)
+	}
+	users, err := getLikeUserList(c, likes)
+	if err != nil {
+		return fmt.Errorf("GetDiscussionLikeList, %v", err)
+	}
+	return jsonResp(c, 0, users)
 }
 
-func GetLikeCount(c echo.Context) error {
-	cid, err := strconv.Atoi(c.Param("id"))
+func GetPostLikeList(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.String(http.StatusBadRequest, "cid not found")
+		return c.String(http.StatusBadRequest, "id not found")
 	}
-	return getFavorCount(c, int64(cid))
+	page, size := getPageSize(c)
+	q := model.QueryParams{
+		"target_ty": model.LikePost,
+		"target_id": strconv.Itoa(id),
+	}
+	likes, err := store.GetLikeList(c, q, page, size)
+	if err != nil {
+		return fmt.Errorf("GetPostLikeList, %v", err)
+	}
+	users, err := getLikeUserList(c, likes)
+	if err != nil {
+		return fmt.Errorf("GetPostLikeList, %v", err)
+	}
+	return jsonResp(c, 0, users)
 }
 
 func CreateLike(c echo.Context) error {
 	in := struct {
-		Cid int64 `json:"id"`
+		T string `json:"type"`
+		Id int64 `json:"id"`
 	}{}
 	if err := c.Bind(&in); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
@@ -43,48 +70,20 @@ func CreateLike(c echo.Context) error {
 		return c.String(http.StatusForbidden, "!user silenced")
 	}
 
-	_, err := store.GetPost(c, int64(in.Cid))
+	err, firstTime := store.CreateLike(c, in.T, in.Id, user.ID)
 	if err != nil {
-		return c.String(http.StatusBadRequest, "comment not exist")
-	}
-
-	var firstTime bool
-	f, err := store.FromContext(c).GetLike(in.Cid, user.ID)
-	if err != nil && err != sql.ErrNoRows {
-		return err
-	}
-
-	// return if already favored
-	if err == nil && f.Status == 1 {
-		return c.NoContent(200)
-	}
-
-	// update if exist
-	if err == nil && f.Status == 0 {
-		f.Status = 1
-		err = store.FromContext(c).UpdateLike(f)
-	}
-
-	// create if not exist
-	if err == sql.ErrNoRows {
-		f = &model.Like{
-			Status:     1,
-			AuthorID:   session.User(c).ID,
-			PostId: in.Cid,
-		}
-		err = store.CreateFavor(c, f)
-		firstTime = true
-	}
-
-	if err != nil {
-		return err
+		return fmt.Errorf("CreateLike, %v", err)
 	}
 
 	// publish favor message
+	like, err := store.GetLike(c, in.T, in.Id, user.ID)
+	if err != nil {
+		fmt.Errorf("CreateLike, %v", err)
+	}
 	if firstTime {
-		events.Dispatch(eLikeCreated, c, f)
+		events.Dispatch(eLikeCreated, c, like)
 	} else {
-		events.Dispatch(eLikeUpdated, c, f)
+		events.Dispatch(eLikeUpdated, c, like)
 	}
 
 	return c.NoContent(200)
@@ -100,7 +99,10 @@ func GetLikeByUser(c echo.Context) error {
 		uid = session.User(c).ID
 	}
 	page, size := getPageSize(c)
-	favors, err := store.FromContext(c).GetLikeListUser(uid, page, size)
+	q := model.QueryParams{
+		"user_id": strconv.Itoa(int(uid)),
+	}
+	favors, err := store.FromContext(c).GetLikeList(q, page, size)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
@@ -111,28 +113,9 @@ func GetLikeByUser(c echo.Context) error {
 	return c.JSON(200, favors)
 }
 
-// WARNING: it's the post's author, not the one give the favor.
-//func attachActorToFavor(c echo.Context, favors []*model.Like) {
-//	Ids := make([]int64, len(favors))
-//	kv := make(map[int64]*model.User)
-//
-//	for i, v := range favors {
-//		Ids[i] = v.ActorID
-//	}
-//	from, _ := store.FromContext(c).GetUserIdList(Ids)
-//	if from != nil {
-//		for _, v := range from {
-//			kv[v.ID] = v
-//		}
-//	}
-//	for _, v := range favors {
-//		v.Actor = kv[v.ActorID]
-//	}
-//}
-
-// implementation
-func DeleteLike(c echo.Context) error {
-	cid, err := strconv.Atoi(c.Param("id"))
+// delete
+func DeletePostLike(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.String(http.StatusBadRequest, "id not found")
 	}
@@ -141,44 +124,58 @@ func DeleteLike(c echo.Context) error {
 		return c.String(http.StatusForbidden, "!user silenced")
 	}
 
-	f, err := store.FromContext(c).GetLike(int64(cid), user.ID)
-	if err == sql.ErrNoRows {
-		return c.NoContent(404)
-	} else if err != nil {
-		return err
+	db := store.FromContext(c)
+	like, err := db.GetLike(model.LikePost,  int64(id), user.ID)
+	if err != nil {
+		return fmt.Errorf("DeletePostLike, get, %v", err)
 	}
 
 	// return if deleted
-	if f.Status == 0 {
+	if like.Status == 0 {
 		return c.NoContent(200)
 	}
 
 	// update favor status
-	f.Status = 0
-	err = store.FromContext(c).UpdateLike(f)
-	if err != nil {
-		return err
+	if err := db.DeleteLike(model.LikePost, int64(id), user.ID); err != nil {
+		return fmt.Errorf("DeletePostLike, del, %v", err)
 	}
-	events.Dispatch(eLikeUpdated, c, f)
+	events.Dispatch(eLikeUpdated, c, like)
 	return c.NoContent(200)
 }
 
-func getFavorList(c echo.Context, pid int64) error {
-	page, size := getPageSize(c)
-	favors, err := store.GetLikeList(c, pid, page, size)
+func DeleteDiscussionLike(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return err
+		return c.String(http.StatusBadRequest, "id not found")
 	}
-	return c.JSON(200, favors)
+	user := session.User(c)
+	if user.Silenced() {
+		return c.String(http.StatusForbidden, "!user silenced")
+	}
+
+	db := store.FromContext(c)
+	like, err := db.GetLike(model.LikeDiscussion, int64(id), user.ID)
+	if err != nil {
+		return fmt.Errorf("DeleteDiscussionLike, get, %v", err)
+	}
+
+	// return if deleted
+	if like.Status == 0 {
+		return c.NoContent(200)
+	}
+
+	// update favor status
+	if err := db.DeleteLike(model.LikePost, int64(id), user.ID); err != nil {
+		return fmt.Errorf("DeleteDiscussionLike, del, %v", err)
+	}
+	events.Dispatch(eLikeUpdated, c, like)
+	return c.NoContent(200)
 }
 
-func getFavorCount(c echo.Context, pid int64) error {
-	num, err := store.GetFavorCount(c, pid)
-	if err != nil {
-		return err
+func getLikeUserList(c echo.Context, likes []*model.Like) ([]*model.User, error) {
+	ids := make([]int64, len(likes))
+	for i, v := range likes {
+		ids[i] = v.UserID
 	}
-	return c.JSON(200, struct {
-		Num int `json:"num"`
-	}{num})
+	return store.FromContext(c).GetUserIdList(ids)
 }
-
