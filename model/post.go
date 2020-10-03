@@ -18,7 +18,7 @@ type Post struct {
 	ReplyID  int64  `json:"reply_id" meddler:"reply_id"`
 
 	// 点赞数
-	LikeCount int `json:"-" meddler:"like_count"`
+	LikeCount int `json:"like_count" meddler:"like_count"`
 
 	// 评论内容
 	Content  string `json:"content" meddler:"content"`

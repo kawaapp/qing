@@ -85,7 +85,7 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 		// likes
 		write.POST("/likes", server.CreateLike)
 		write.DELETE("/posts/:id/likes", server.DeletePostLike)
-		write.DELETE("/discussions/:id/Likes", server.DeleteDiscussionLike)
+		write.DELETE("/discussions/:id/likes", server.DeleteDiscussionLike)
 
 		// notification - comment/mention/like
 		write.PUT("/notifications/:id/read", server.SetNotificationRead)
