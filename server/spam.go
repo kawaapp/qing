@@ -21,7 +21,7 @@ func CreateSpamWords(c echo.Context) error {
 		"app_spamwords": in.Words,
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("CreateSpamWords, %v", err)
 	}
 	return c.NoContent(200)
 }
@@ -29,7 +29,7 @@ func CreateSpamWords(c echo.Context) error {
 func GetSpamWords(c echo.Context) error {
 	words, err := store.GetMetaValue(c, "app_spamwords")
 	if err != nil && err != sql.ErrNoRows {
-		return err
+		return fmt.Errorf("GetSpamWords, %v", err)
 	}
 	return c.String(200, words)
 }

@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"database/sql"
 	"sort"
+	"fmt"
 )
 
 // tags
@@ -24,7 +25,7 @@ func GetDiscussionsByTag(c echo.Context) error {
 	page, limit := getPageSize(c)
 	discussions, err := store.GetDiscussionByTag(c, decoded, page, limit)
 	if err != nil {
-		return err
+		return fmt.Errorf("GetDiscussionsByTag, %v", err)
 	}
 	p := makePayload(0, discussions)
 	if includes(c, "user") {
@@ -36,7 +37,7 @@ func GetDiscussionsByTag(c echo.Context) error {
 func GetTagList(c echo.Context) error {
 	tags, err := store.GetTagList(c)
 	if err != nil {
-		return err
+		return fmt.Errorf("GetTagList, %v", err)
 	}
 	sort.SliceStable(tags, func(i, j int) bool {
 		return tags[i].Order < tags[j].Order
@@ -54,7 +55,7 @@ func LinkTagPost(c echo.Context) error {
 	}
 	err := store.LinkTagPost(c, int64(in.PID), in.Tags)
 	if err != nil {
-		return err
+		return fmt.Errorf("LinkTagPost, %v", err)
 	}
 	return c.NoContent(200)
 }
@@ -69,7 +70,7 @@ func CreateTag(c echo.Context) error {
 	}
 	t, err := store.FromContext(c).CreateTag(in.Tag, in.Summary)
 	if err != nil {
-		return err
+		return fmt.Errorf("CreateTag, %v", err)
 	}
 	return c.JSON(200, t)
 }
@@ -84,7 +85,7 @@ func UpdateTag(c echo.Context) error {
 		return c.NoContent(404)
 	}
 	if err != nil {
-		return err
+		return fmt.Errorf("UpdateTag, %v", err)
 	}
 	m := echo.Map{}
 	if err := c.Bind(&m); err != nil {
@@ -104,7 +105,7 @@ func UpdateTag(c echo.Context) error {
 	}
 	err = store.FromContext(c).UpdateTag(tag)
 	if err != nil {
-		return err
+		return fmt.Errorf("UpdateTag, %v", err)
 	}
 	return c.JSON(200, tag)
 }
@@ -116,7 +117,7 @@ func DeleteTag(c echo.Context) error {
 	}
 	err = store.FromContext(c).DeleteTag(int64(id))
 	if err != nil {
-		return err
+		return fmt.Errorf("DeleteTag, %v", err)
 	}
 	return c.NoContent(200)
 }

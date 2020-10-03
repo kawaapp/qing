@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"log"
 	"time"
+	"fmt"
 )
 
 // 用户信息相关, 此处只提供更新和读取的方法，创建见 login.go
@@ -24,7 +25,7 @@ func DeleteUser(c echo.Context) error {
 	}
 
 	if err := store.FromContext(c).DeleteBindUser(int64(id)); err != nil {
-		return err
+		return fmt.Errorf("DeleteUser, %v", err)
 	}
 	return c.NoContent(200)
 }
@@ -58,7 +59,7 @@ func SetUserStatus(c echo.Context) error {
 	}
 	err = store.UpdateUser(c, usr)
 	if err != nil {
-		return err
+		return fmt.Errorf("SetUserStatus, %v", err)
 	}
 	return c.JSON(200, usr)
 }
@@ -109,7 +110,7 @@ func UpdateUser(c echo.Context) error {
 	}
 
 	if err := store.UpdateUser(c, user); err != nil {
-		return err
+		return fmt.Errorf("UpdateUser, %v", err)
 	}
 	return c.JSON(200, user)
 }

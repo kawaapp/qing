@@ -49,7 +49,7 @@ func UpdateCategory(c echo.Context) error {
 	db := store.FromContext(c)
 	ctg, err := db.GetCategory(int64(id))
 	if err != nil {
-		return err
+		return fmt.Errorf("UpdateCategory, %v", err)
 	}
 
 	m := echo.Map{}

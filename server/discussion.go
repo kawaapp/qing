@@ -54,7 +54,7 @@ func GetDiscussionList(c echo.Context) error {
 
 	discussions, err := db.GetDiscussionList(q, page, size)
 	if err != nil {
-		return err
+		return fmt.Errorf("GetDiscussionList, %v", err)
 	}
 
 	p := makePayload(0, discussions)
@@ -167,7 +167,7 @@ func AdminCreateDiscussion(c echo.Context) error {
 	}
 
 	if err := store.CreateDiscussion(c, discussion); err != nil {
-		return err
+		return fmt.Errorf("AdminCreateDiscussion, %v", err)
 	}
 	return c.JSON(200, discussion)
 }
@@ -179,7 +179,7 @@ func UpdateDiscussion(c echo.Context) error {
 	}
 	d, err := store.FromContext(c).GetDiscussion(int64(id))
 	if err != nil {
-		return err
+		return fmt.Errorf("UpdateDiscussion, %v", err)
 	}
 
 	// ensure author is valid
@@ -202,7 +202,7 @@ func UpdateDiscussion(c echo.Context) error {
 		d.Content = value.(string)
 	}
 	if err := store.UpdateDiscussion(c, d); err != nil {
-		return errors.New(fmt.Sprintf("Error: update discussion %d. %s", id, err))
+		return fmt.Errorf("UpdateDiscussion, %v", err)
 	}
 	return c.JSON(200, d)
 }
@@ -216,7 +216,7 @@ func DeleteDiscussion(c echo.Context) error {
 	if err == sql.ErrNoRows {
 		return c.NoContent(404)
 	} else if err != nil {
-		return err
+		return fmt.Errorf("DeleteDiscussion, %v", err)
 	}
 	// ensure author is valid
 	if user := session.User(c); user.Login != "Admin" && user.ID != d.AuthorID {
@@ -245,7 +245,7 @@ func GetDiscussionByUser(c echo.Context) error {
 	if err == sql.ErrNoRows {
 		return c.String(404, "no user found")
 	} else if err != nil {
-		return err
+		return fmt.Errorf("GetDiscussionByUser, %v", err)
 	}
 
 	page, size := getPageSize(c)

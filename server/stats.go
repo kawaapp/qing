@@ -6,6 +6,7 @@ import (
 	"github.com/kawaapp/kawaqing/store"
 	"time"
 	"net/http"
+	"fmt"
 )
 
 // Stats overview filter by post/user/comments
@@ -43,7 +44,7 @@ func GetStats(c echo.Context) error {
 		data, err = store.GetDailyNewFavor(c, from, to)
 	}
 	if err != nil {
-		return err
+		return fmt.Errorf("GetStats, %v", err)
 	}
 	return c.JSON(200, data)
 }

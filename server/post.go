@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"database/sql"
 	"log"
+	"fmt"
 )
 
 
@@ -27,7 +28,7 @@ func GetPostList(c echo.Context) error {
 	}
 	posts, err := store.FromContext(c).GetPostList(q, page, size)
 	if err != nil {
-		return err
+		return fmt.Errorf("GetPostList, %v", err)
 	}
 
 	p := makePayload(0, posts)
@@ -95,7 +96,7 @@ func CreatePost(c echo.Context) error {
 
 	// insert db
 	if err := store.CreatePost(c, post); err != nil {
-		return err
+		return fmt.Errorf("CreatePost, %v", err)
 	}
 
 	// publish comment message
@@ -111,7 +112,7 @@ func UpdatePost(c echo.Context) error {
 	}
 	p, err := store.FromContext(c).GetPost(int64(id))
 	if err != nil {
-		return err
+		return fmt.Errorf("UpdatePost, %v", err)
 	}
 
 	// ensure author is valid
@@ -131,7 +132,7 @@ func UpdatePost(c echo.Context) error {
 		p.Content = value.(string)
 	}
 	if err := store.UpdatePost(c, p); err != nil {
-		return err
+		return fmt.Errorf("UpdatePost, %v", err)
 	}
 	return c.JSON(200, p)
 }
@@ -145,7 +146,7 @@ func DeletePost(c echo.Context) error {
 	if err == sql.ErrNoRows {
 		return c.NoContent(404)
 	} else if err != nil {
-		return err
+		return fmt.Errorf("DeletePost, %v", err)
 	}
 	// ensure author is valid
 	if user := session.User(c); user.Login != "Admin" && user.ID != cmt.AuthorID {
@@ -174,7 +175,7 @@ func GetPostByUser(c echo.Context) error {
 	if err == sql.ErrNoRows {
 		return c.String(404, "user not found")
 	} else if err != nil {
-		return err
+		return fmt.Errorf("GetPostByUser, %v", err)
 	}
 
 	page, size := getPageSize(c)

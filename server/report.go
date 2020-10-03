@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"database/sql"
+	"fmt"
 )
 
 func CreateReport(c echo.Context) error  {
@@ -21,7 +22,7 @@ func CreateReport(c echo.Context) error  {
 
 	err := store.FromContext(c).CreateReport(report)
 	if err != nil {
-		return err
+		return fmt.Errorf("CreateReport, %v", err)
 	}
 	return c.JSON(200, report)
 }
@@ -36,7 +37,7 @@ func GetReport(c echo.Context) error  {
 		return c.NoContent(http.StatusNotFound)
 	}
 	if err != nil {
-		return err
+		return fmt.Errorf("GetReport, %v", err)
 	}
 	return c.JSON(200, rpt)
 }
@@ -55,7 +56,7 @@ func SetReportStatus(c echo.Context) error {
 		return c.NoContent(404)
 	}
 	if err != nil {
-		return err
+		return fmt.Errorf("SetReportStatus, %v", err)
 	}
 	rpt.Status = int64(st)
 	err = store.FromContext(c).UpdateReport(rpt)

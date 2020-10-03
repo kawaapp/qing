@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/labstack/echo"
 	"github.com/kawaapp/kawaqing/store"
+	"fmt"
 )
 
 // admin - api
@@ -15,7 +16,7 @@ func SearchUser(c echo.Context) error {
 	db := store.FromContext(c)
 	users, err := db.GetUserList(params, page, size)
 	if err != nil {
-		return err
+		return fmt.Errorf("SearchUser, %v", err)
 	}
 
 	p := makePayload(0, users)
@@ -34,7 +35,7 @@ func SearchDiscussions(c echo.Context) error {
 	db := store.FromContext(c)
 	discussions, err := db.GetDiscussionList(params, page, size)
 	if err != nil {
-		return err
+		return fmt.Errorf("SearchDiscussions, %v", err)
 	}
 
 	p := makePayload(0, discussions)
@@ -57,7 +58,7 @@ func SearchPosts(c echo.Context) error {
 	db := store.FromContext(c)
 	posts, err := db.GetPostList(params, page, size)
 	if err != nil {
-		return err
+		return fmt.Errorf("SearchPosts, %v", err)
 	}
 	p := makePayload(0, posts)
 	if page == 0 {
@@ -82,7 +83,7 @@ func SearchReport(c echo.Context) error {
 	db := store.FromContext(c)
 	reports, err := db.GetReportList(params, page, size)
 	if err != nil {
-		return err
+		return fmt.Errorf("SearchReport, %v", err)
 	}
 	p := makePayload(0, reports)
 	if page == 0 {
