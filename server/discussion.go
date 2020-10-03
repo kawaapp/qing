@@ -116,17 +116,8 @@ func CreateDiscussion(c echo.Context) error {
 		Content: in.Content,
 	}
 	if err := store.CreateDiscussion(c, discussion); err != nil {
-		return err
+		return fmt.Errorf("CreateDiscussion, %v", err)
 	}
-	post := &model.Post{
-		DiscussionID: discussion.ID,
-		AuthorID: user.ID,
-		Content: in.Content,
-	}
-	if err := store.CreatePost(c, post); err != nil {
-		return err
-	}
-
 	events.Dispatch(eDiscussionCreated, c, discussion)
 	return c.JSON(200, discussion)
 }
