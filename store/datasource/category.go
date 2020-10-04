@@ -6,7 +6,7 @@ import (
 )
 
 func (db *datasource) GetCategoryList() ([]*model.Category, error) {
-	query := "SELECT * FROM categories ORDER BY _order ASC, id DESC"
+	query := "SELECT * FROM categories ORDER BY _sort ASC, id DESC"
 	arr := make([]*model.Category, 0)
 	err := meddler.QueryAll(db, &arr, query)
 	return arr, err
