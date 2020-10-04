@@ -191,6 +191,9 @@ func GetPostByUser(c echo.Context) error {
 	if includes(c, "like") {
 		attachLikeToPost(c, posts, p)
 	}
+	if includes(c, "discussion") {
+		attachDzToPost(c, posts, p)
+	}
 	return c.JSON(200, p)
 }
 
@@ -233,6 +236,24 @@ func attachLikeToPost(c echo.Context, posts []*model.Post, p payload) {
 		kv[v] = v
 	}
 	p.Entities["likes"] = kv
+}
+
+func attachDzToPost(c echo.Context, posts []*model.Post, p payload) {
+	ids := make([]int64, len(posts))
+	kv := make(map[int64]*model.Discussion)
+
+	// favored state
+	for i, v := range posts {
+		ids[i] = v.ID
+	}
+	discussions, err := store.FromContext(c).GetDiscussionListByIds(ids)
+	if err != nil {
+		log.Printf("attachDzToPost, %v", err)
+	}
+	for _, v := range discussions {
+		kv[v.ID] = v
+	}
+	p.Entities["discussions"] = kv
 }
 
 // events
