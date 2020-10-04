@@ -280,6 +280,15 @@ func TestUpdateUserExp(t *testing.T) {
 	}
 }
 
+func createUserList(s *datasource, users []model.User) error {
+	for i := range users {
+		if err := s.CreateUser(&users[i]); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func beforeUser() *datasource {
 	s := newTest()
 	s.Exec("DELETE FROM users;")

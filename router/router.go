@@ -32,6 +32,11 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 		get.GET("/users/:id/discussions", server.GetDiscussionByUser)
 		get.GET("/users/:id/posts", server.GetPostByUser)
 		get.GET("/users/:id/likes", server.GetLikeByUser)
+		get.GET("/users/:id/followers", server.GetFollowerList)
+		get.GET("/users/:id/followings", server.GetFollowingList)
+
+		// 是否关注某人, 需要登录
+		get.GET("/users/followings/:uid", server.GetFollowing, session.AttachUser())
 
 		// discussion
 		get.GET("/discussions", server.GetDiscussionList)
@@ -71,6 +76,10 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 		// user
 		write.PUT("/users", server.UpdateUser)
 		write.GET("/users/self", server.Self)
+
+		// follow
+		write.POST("/users/followings", server.CreateFollow)
+		write.DELETE("/users/followings/:uid", server.DeleteFollow)
 
 		// discussion
 		write.POST("/discussions", server.CreateDiscussion)

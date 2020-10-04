@@ -57,6 +57,7 @@ var index = []string{
 	createTableMeta,
 	createTableMedia,
 	createTableReport,
+	createTableFollow,
 }
 
 //eg:
@@ -324,4 +325,15 @@ report_ty   INTEGER,
 content     string,
 other       string,
 images      string
+);`
+
+const createTableFollow = `
+CREATE TABLE IF NOT EXISTS follows (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+created_at  INTEGER,
+
+user_id     INTEGER,
+follower_id INTEGER,
+
+UNIQUE(user_id, follower_id)
 );`

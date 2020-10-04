@@ -30,6 +30,14 @@ type UserStore interface {
 	// user-exp-sign
 	UpdateUserExp(uid int64, exp int) error
 	UpdateUserSign(uid int64, count int) error
+
+	// follow
+	GetFollowerList(uid int64, page, size int) ([]*model.User, error)
+	GetFollowingList(uid int64, page, size int) ([]*model.User, error)
+	GetFollow(uid, fid int64) (*model.Follow, error)
+
+	CreateFollow(f *model.Follow) error
+	DeleteFollow(uid, fid int64) error
 }
 
 type DiscussionStore interface {

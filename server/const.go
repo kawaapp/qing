@@ -17,4 +17,6 @@ const (
 
 	// 用户登录
 	eUserLogin  = "user.login"
+	eUserFollow = "user.follow"
+	eUserUnfollow = "user.unfollow"
 )
