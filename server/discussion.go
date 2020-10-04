@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"strconv"
 	"database/sql"
-	"strings"
 	"log"
 )
 
@@ -250,9 +249,9 @@ func GetDiscussionByUser(c echo.Context) error {
 
 	page, size := getPageSize(c)
 	q := model.QueryParams {
-		"user_id": strconv.Itoa(int(user.ID)),
+		"author_id": strconv.Itoa(int(user.ID)),
 	}
-	discussions, err := store.FromContext(c).GetDiscussionList(q, page, size)
+	discussions, err := store.FromContext(c).GetDiscussionList(q, page-1, size)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
@@ -260,7 +259,7 @@ func GetDiscussionByUser(c echo.Context) error {
 	p := makePayload(0, discussions)
 
 	// attach users
-	if strings.Contains(c.QueryParam("includes"), "user") {
+	if includes(c, "user") {
 		p.Entities["users"] = map[int64]*model.User {
 			user.ID: user,
 		}
