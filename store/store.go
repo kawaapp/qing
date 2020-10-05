@@ -51,6 +51,16 @@ type DiscussionStore interface {
 	DeleteDiscussion(id int64) error
 }
 
+type FavoriteStore interface {
+	GetFavoriteList(q model.QueryParams, page, size int) ([]*model.Favorite, error)
+	GetFavoriteCount(q model.QueryParams) (int, error)
+
+	CreateFavorite(f *model.Favorite) error
+	GetFavoriteUser(uid, pid int64) (*model.Favorite, error)
+	GetFavoriteId(id int64) (*model.Favorite, error)
+	DeleteFavorite(id int64) error
+}
+
 type PostStore interface {
 	GetPostList(params model.QueryParams, page, size int) ([]*model.Post, error)
 	GetPostCount(params model.QueryParams) (int, error)
@@ -183,6 +193,9 @@ type Store interface {
 
 	// analytics
 	AnalyseStore
+
+	// favorite
+	FavoriteStore
 }
 
 // user

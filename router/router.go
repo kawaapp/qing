@@ -32,6 +32,7 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 		get.GET("/users/:id/discussions", server.GetDiscussionByUser)
 		get.GET("/users/:id/posts", server.GetPostByUser)
 		get.GET("/users/:id/likes", server.GetLikeByUser)
+		get.GET("/users/:id/favorites", server.GetFavoriteByUser)
 		get.GET("/users/:id/followers", server.GetFollowerList)
 		get.GET("/users/:id/followings", server.GetFollowingList)
 
@@ -95,6 +96,10 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 		write.POST("/likes", server.CreateLike)
 		write.DELETE("/posts/:id/likes", server.DeletePostLike)
 		write.DELETE("/discussions/:id/likes", server.DeleteDiscussionLike)
+
+		// favorites
+		write.POST("/discussions/:id/favorites", server.CreateFavorite)
+		write.DELETE("/discussions/:id/favorites", server.DeleteFavorite)
 
 		// notification - comment/mention/like
 		write.PUT("/notifications/:id/read", server.SetNotificationRead)

@@ -3,15 +3,19 @@ package datasource
 import (
 	"github.com/kawaapp/kawaqing/model"
 	"github.com/russross/meddler"
+	"fmt"
 )
 
-func (db *datasource) GetFavoriteListUser(uid int64, page, size int) ([]*model.Favorite, error)  {
-	if page == 0 {
-		page = 1
-	}
+func (db *datasource) GetFavoriteList(q model.QueryParams, page, size int) ([]*model.Favorite, error)  {
+	query, args := sqlGetFavoriteList(sqlFavoriteSelect, q, page, size)
 	data := make([]*model.Favorite, 0)
-	err := meddler.QueryAll(db, &data, sqlListFavoriteUser, uid, size, (page-1) * size)
+	err := meddler.QueryAll(db, &data, query, args...)
 	return data, err
+}
+
+func (db *datasource) GetFavoriteCount(q model.QueryParams) (int, error) {
+	query, args := sqlGetFavoriteList(sqlFavoriteSelect, q, 0, 0)
+	return Count(db, query, args...)
 }
 
 func (db *datasource) CreateFavorite(f *model.Favorite) error  {
@@ -36,15 +40,12 @@ func (db *datasource) DeleteFavorite(id int64) error {
 	return err
 }
 
-const sqlListFavoriteUser = `
+const sqlFavoriteSelect = `
 SELECT
 	id,
 	created_at,
 	user_id,
 	discussion_id
-FROM favorites
-WHERE user_id = ?
-ORDER BY id DESC LIMIT ? OFFSET ?
 `
 
 const sqlGetFavorite = `
@@ -56,6 +57,28 @@ SELECT
 FROM favorites
 WHERE user_id=? AND discussion_id=? LIMIT 1
 `
+
+func sqlGetFavoriteList(baseQuery string, params model.QueryParams, page, size int) (query string, args []interface{})  {
+	query += baseQuery
+	query += " FROM favorites"
+
+	where := ""
+	if q, ok := params["user_id"]; ok {
+		where += " AND user_id=?"
+		args = append(args, q)
+	}
+	if q, ok := params["discussion_id"]; ok {
+		where += " AND discussion_id=?"
+		args = append(args, q)
+	}
+	if len(where) > 0 {
+		query += " WHERE 1=1 " + where
+	}
+	if size > 0 {
+		query += fmt.Sprintf(" ORDER BY id DESC LIMIT %d OFFSET %d", size, page*size )
+	}
+	return
+}
 
 const sqlDeleteFavoriteId  = `
 DELETE FROM favorites WHERE id=?
