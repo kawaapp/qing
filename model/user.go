@@ -35,6 +35,10 @@ type User struct {
 	BlockedAt  int64 `json:"blocked_at" meddler:"blocked_at"`
 	SilencedAt int64 `json:"silenced_at" meddler:"silenced_at"`
 
+	// 粉丝数和关注数
+	FollowerCount  int `json:"follower_count" meddler:"follower_count"`
+	FollowingCount int `json:"following_count" meddler:"following_count"`
+
 	// Hash is a unique token used to sign tokens.
 	Hash         string `json:"-" meddler:"hash"`
 	PasswordHash string `json:"-" meddler:"password_hash"`

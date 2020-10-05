@@ -12,6 +12,7 @@ import (
 	"log"
 	"time"
 	"fmt"
+	"database/sql"
 )
 
 // 用户信息相关, 此处只提供更新和读取的方法，创建见 login.go
@@ -70,11 +71,25 @@ func GetUser(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
-	if u, err := store.GetUser(c, int64(id)); err != nil {
+	usr, err := store.GetUser(c, int64(id))
+	if err == sql.ErrNoRows {
 		return c.NoContent(404)
-	} else {
-		return jsonResp(c, 0, u)
 	}
+	if err != nil {
+		return fmt.Errorf("GetUser, %v", err)
+	}
+
+	out := struct { *model.User; Following bool }{
+		User: usr,
+		Following: false,
+	}
+	// 是否已关注
+	if me := session.User(c); me != nil {
+		if _, err := store.FromContext(c).GetFollow(usr.ID, me.ID); err == nil {
+			out.Following = true
+		}
+	}
+	return jsonResp(c, 0 ,out)
 }
 
 func Self(c echo.Context) error {
@@ -133,6 +148,53 @@ func usrOnUserLogin(c echo.Context, v interface{}) error  {
 	return nil
 }
 
+
+func usrOnUserFollow(c echo.Context, v interface{}) error {
+	f, ok := v.(*model.Follow)
+	if !ok {
+		return typeError("Follow")
+	}
+
+	// follower's counter
+	follower := session.User(c)
+	follower.FollowingCount += 1
+	if err := store.UpdateUser(c, follower); err != nil {
+		return err
+	}
+
+	// target user's counter
+	following, err := store.GetUser(c, f.UserId)
+	if err != nil {
+		return err
+	}
+	following.FollowerCount += 1
+	return store.UpdateUser(c, following)
+}
+
+func usrOnUserUnfollow(c echo.Context, v interface{}) error {
+	f, ok := v.(*model.Follow)
+	if !ok {
+		return typeError("Follow")
+	}
+
+	// follower's counter
+	follower := session.User(c)
+	follower.FollowingCount = Max(0, follower.FollowingCount - 1)
+	if err := store.UpdateUser(c, follower); err != nil {
+		return err
+	}
+
+	// target user's counter
+	following, err := store.GetUser(c, f.UserId)
+	if err != nil {
+		return err
+	}
+	following.FollowerCount = Max(0, following.FollowerCount - 1)
+	return store.UpdateUser(c, following)
+}
+
 func init()  {
 	events.Subscribe(eUserLogin, usrOnUserLogin)
+	events.Subscribe(eUserFollow, usrOnUserFollow)
+	events.Subscribe(eUserUnfollow, usrOnUserUnfollow)
 }

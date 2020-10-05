@@ -25,7 +25,7 @@ func GetFollowerList(c echo.Context) error  {
 	if err != nil {
 		return fmt.Errorf("GetFollowerList, %v", err)
 	}
-	return c.JSON(200, users)
+	return  jsonResp(c, 0, users)
 }
 
 func GetFollowingList(c echo.Context) error {
@@ -42,7 +42,7 @@ func GetFollowingList(c echo.Context) error {
 	if err != nil {
 		return fmt.Errorf("GetFollowingList, %v", err)
 	}
-	return c.JSON(200, users)
+	return jsonResp(c, 0, users)
 }
 
 func GetFollowing(c echo.Context) error {
