@@ -60,6 +60,7 @@ var index = []string{
 	createTableMedia,
 	createTableReport,
 	createTableFollow,
+	createTableFavorite,
 }
 
 //eg:
@@ -321,5 +322,17 @@ user_id     INTEGER,
 follower_id INTEGER,
 
 UNIQUE(user_id, follower_id)
+);`
+
+
+const createTableFavorite = `
+CREATE TABLE IF NOT EXISTS favorites (
+id INTEGER PRIMARY KEY AUTO_INCREMENT,
+created_at  INTEGER,
+
+user_id     INTEGER,
+discussion_id     INTEGER,
+
+UNIQUE(user_id, discussion_id)
 );`
 
