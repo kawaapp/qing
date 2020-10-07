@@ -123,6 +123,9 @@ func UpdateUser(c echo.Context) error {
 	if value, ok := in["avatar"]; ok {
 		user.Avatar = value.(string)
 	}
+	if value, ok := in["summary"]; ok {
+		user.Summary = value.(string)
+	}
 
 	if err := store.UpdateUser(c, user); err != nil {
 		return fmt.Errorf("UpdateUser, %v", err)
