@@ -24,6 +24,7 @@ type discussion struct {
 type outDiscussion struct {
 	*model.Discussion
 	Liked bool `json:"liked"`
+	Favorited bool `json:"favorited"`
 }
 
 func (in *discussion) validate() error  {
@@ -87,6 +88,7 @@ func GetDiscussion(c echo.Context) error {
 	// get user like state
 	var (
 		liked = false
+		favor = false
 	)
 
 	// optional user
@@ -95,11 +97,15 @@ func GetDiscussion(c echo.Context) error {
 		if err == nil {
 			liked = true
 		}
+		_, err = store.FromContext(c).GetFavoriteUser(usr.ID, int64(id))
+		if err == nil {
+			favor = true
+		}
 	}
 
 	// with extra state
 	out := outDiscussion{
-		Discussion: discussion, Liked: liked,
+		Discussion: discussion, Liked: liked, Favorited: favor,
 	}
 
 	p := makePayload(0, out)

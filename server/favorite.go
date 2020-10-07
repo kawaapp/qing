@@ -35,7 +35,14 @@ func GetFavoriteByUser(c echo.Context) error {
 	if err != nil {
 		return fmt.Errorf("GetFavoriteByUser, %v", err)
 	}
-	return jsonResp(c, 0, dzs)
+
+	p := makePayload(0, dzs)
+
+	// attach users
+	if includes(c, "user") {
+		attachUserToDiscussion(c, dzs, p)
+	}
+	return c.JSON(200, p)
 }
 
 func CreateFavorite(c echo.Context) error  {
