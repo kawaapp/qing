@@ -78,6 +78,9 @@ func Load(mwx ...echo.MiddlewareFunc) *echo.Echo {
 		write.PUT("/users", server.UpdateUser)
 		write.GET("/users/self", server.Self)
 
+		// password reset
+		write.PUT("/users/password/reset", server.HandlePasswordReset)
+
 		// follow
 		write.POST("/users/followings", server.CreateFollow)
 		write.DELETE("/users/followings/:uid", server.DeleteFollow)

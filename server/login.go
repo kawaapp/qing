@@ -14,6 +14,8 @@ import (
 	"net/http"
 	"time"
 	"database/sql"
+	"github.com/kawaapp/kawaqing/router/mwx/session"
+	"fmt"
 )
 
 type loginUser struct {
@@ -191,6 +193,25 @@ func HandleLogout(c echo.Context) error {
 	return nil
 }
 
+func HandlePasswordReset(c echo.Context) error {
+	in := struct {
+		PasswordOld string `json:"password_old"`
+		PasswordNew string `json:"password_new"`
+	}{}
+	if err := c.Bind(&in); err != nil {
+		return c.String(200, err.Error())
+	}
+	usr := session.User(c)
+	if err := auth.CheckPassword(in.PasswordOld, usr.PasswordHash); err != nil {
+		return errorResp(c, 4001, fmt.Errorf("password error"))
+	}
+	hash := auth.HashPassword(in.PasswordNew)
+	usr.PasswordHash = hash
+	if err := store.UpdateUser(c, usr); err != nil {
+		return fmt.Errorf("HandleReset, %v", err)
+	}
+	return c.NoContent(200)
+}
 
 func GenerateUserId(prefix string) (string) {
 	uid := base32.StdEncoding.EncodeToString(
