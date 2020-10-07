@@ -79,7 +79,7 @@ func GetUser(c echo.Context) error {
 		return fmt.Errorf("GetUser, %v", err)
 	}
 
-	out := struct { *model.User; Following bool }{
+	out := struct { *model.User; Following bool `json:"following"` }{
 		User: usr,
 		Following: false,
 	}
