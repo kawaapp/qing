@@ -37,7 +37,7 @@ func GetNotificationList(c echo.Context) error {
 	}
 
 	page, size := getPageSize(c)
-	messages, err = store.GetNotificationListType(c, usr.ID, mt, page, size)
+	messages, err = store.GetNotificationListType(c, usr.ID, mt, page-1, size)
 	if err != nil {
 		return err
 	}

@@ -23,7 +23,7 @@ func GetDiscussionsByTag(c echo.Context) error {
 	}
 
 	page, limit := getPageSize(c)
-	discussions, err := store.GetDiscussionByTag(c, decoded, page, limit)
+	discussions, err := store.GetDiscussionByTag(c, decoded, page-1, limit)
 	if err != nil {
 		return fmt.Errorf("GetDiscussionsByTag, %v", err)
 	}

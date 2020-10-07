@@ -46,11 +46,12 @@ func includes(c echo.Context, name string) bool {
 	return strings.Contains(c.QueryParam("includes"), name)
 }
 
+// default start page = 1
 func getPageSize(c echo.Context) (page, size int) {
 	if p, err := strconv.Atoi(c.FormValue("page")); err == nil {
 		page = p
 	} else {
-		page = 0
+		page = 1
 	}
 	if sz, err := strconv.Atoi(c.FormValue("size")); sz > 0 && err == nil {
 		size = sz

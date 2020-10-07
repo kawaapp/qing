@@ -14,7 +14,7 @@ func SearchUser(c echo.Context) error {
 		params = getQueryParams(c)
 	)
 	db := store.FromContext(c)
-	users, err := db.GetUserList(params, page, size)
+	users, err := db.GetUserList(params, page-1, size)
 	if err != nil {
 		return fmt.Errorf("SearchUser, %v", err)
 	}
@@ -33,7 +33,7 @@ func SearchDiscussions(c echo.Context) error {
 		params = getQueryParams(c)
 	)
 	db := store.FromContext(c)
-	discussions, err := db.GetDiscussionList(params, page, size)
+	discussions, err := db.GetDiscussionList(params, page-1, size)
 	if err != nil {
 		return fmt.Errorf("SearchDiscussions, %v", err)
 	}
@@ -56,7 +56,7 @@ func SearchPosts(c echo.Context) error {
 		params = getQueryParams(c)
 	)
 	db := store.FromContext(c)
-	posts, err := db.GetPostList(params, page, size)
+	posts, err := db.GetPostList(params, page-1, size)
 	if err != nil {
 		return fmt.Errorf("SearchPosts, %v", err)
 	}
@@ -81,7 +81,7 @@ func SearchReport(c echo.Context) error {
 		params = getQueryParams(c)
 	)
 	db := store.FromContext(c)
-	reports, err := db.GetReportList(params, page, size)
+	reports, err := db.GetReportList(params, page-1, size)
 	if err != nil {
 		return fmt.Errorf("SearchReport, %v", err)
 	}

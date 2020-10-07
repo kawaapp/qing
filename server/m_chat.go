@@ -22,7 +22,7 @@ func GetChatUserList(c echo.Context) error {
 		uid = session.User(c).ID
 		page, limit = getPageSize(c)
 	)
-	data, err := store.FromContext(c).GetChatUserList(uid, page, limit)
+	data, err := store.FromContext(c).GetChatUserList(uid, page-1, limit)
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func GetChatListByUser(c echo.Context) error {
 		uid = session.User(c).ID
 		page, limit = getPageSize(c)
 	)
-	data, err := store.FromContext(c).GetChatMsgList(int64(from), uid, page, limit)
+	data, err := store.FromContext(c).GetChatMsgList(int64(from), uid, page-1, limit)
 	if err != nil {
 		return err
 	}

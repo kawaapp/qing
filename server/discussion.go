@@ -51,7 +51,7 @@ func GetDiscussionList(c echo.Context) error {
 		q["cate_id"] = cid
 	}
 
-	discussions, err := db.GetDiscussionList(q, page, size)
+	discussions, err := db.GetDiscussionList(q, page-1, size)
 	if err != nil {
 		return fmt.Errorf("GetDiscussionList, %v", err)
 	}

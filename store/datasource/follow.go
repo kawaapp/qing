@@ -25,16 +25,13 @@ func (db *datasource) GetFollowerList(uid int64, page, size int) ([]*model.User,
 		page = 1
 	}
 	users := make([]*model.User, 0)
-	err := meddler.QueryAll(db, &users, sqlGetFollowerList, uid, size, (page-1)*size)
+	err := meddler.QueryAll(db, &users, sqlGetFollowerList, uid, size, page*size)
 	return users, err
 }
 
 func (db *datasource) GetFollowingList(uid int64, page, size int) ([]*model.User, error) {
-	if page == 0 {
-		page = 1
-	}
 	users := make([]*model.User, 0)
-	err := meddler.QueryAll(db, &users, sqlGetFollowingList, uid, size, (page-1)*size)
+	err := meddler.QueryAll(db, &users, sqlGetFollowingList, uid, size, page*size)
 	return users, err
 }
 

@@ -23,7 +23,7 @@ func GetDiscussionLikeList(c echo.Context) error {
 		"target_ty": model.LikeDiscussion,
 		"target_id": strconv.Itoa(id),
 	}
-	likes, err := store.GetLikeList(c, q, page, size)
+	likes, err := store.GetLikeList(c, q, page-1, size)
 	if err != nil {
 		return fmt.Errorf("GetDiscussionLikeList, %v", err)
 	}
@@ -44,7 +44,7 @@ func GetPostLikeList(c echo.Context) error {
 		"target_ty": model.LikePost,
 		"target_id": strconv.Itoa(id),
 	}
-	likes, err := store.GetLikeList(c, q, page, size)
+	likes, err := store.GetLikeList(c, q, page-1, size)
 	if err != nil {
 		return fmt.Errorf("GetPostLikeList, %v", err)
 	}

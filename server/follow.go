@@ -21,7 +21,7 @@ func GetFollowerList(c echo.Context) error  {
 		uid = session.User(c).ID
 	}
 	page, size := getPageSize(c)
-	users, err := store.FromContext(c).GetFollowerList(uid, page, size)
+	users, err := store.FromContext(c).GetFollowerList(uid, page-1, size)
 	if err != nil {
 		return fmt.Errorf("GetFollowerList, %v", err)
 	}
@@ -38,7 +38,7 @@ func GetFollowingList(c echo.Context) error {
 		uid = session.User(c).ID
 	}
 	page, size := getPageSize(c)
-	users, err := store.FromContext(c).GetFollowingList(uid, page, size)
+	users, err := store.FromContext(c).GetFollowingList(uid, page-1, size)
 	if err != nil {
 		return fmt.Errorf("GetFollowingList, %v", err)
 	}

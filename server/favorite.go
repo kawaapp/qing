@@ -27,7 +27,7 @@ func GetFavoriteByUser(c echo.Context) error {
 	q := model.QueryParams{
 		"user_id": c.Param("id"),
 	}
-	favors, err := store.FromContext(c).GetFavoriteList(q, page, size)
+	favors, err := store.FromContext(c).GetFavoriteList(q, page-1, size)
 	if err != nil {
 		return fmt.Errorf("GetFavoriteByUser, %v", err)
 	}
