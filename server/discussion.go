@@ -19,6 +19,7 @@ import (
 type discussion struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
+	CateID  int64 `json:"cate_id"`
 }
 
 type outDiscussion struct {
@@ -157,6 +158,7 @@ func CreateDiscussion(c echo.Context) error {
 		AuthorID: user.ID,
 		Title: in.Title,
 		Content: in.Content,
+		CategoryID: in.CateID,
 	}
 	if err := store.CreateDiscussion(c, discussion); err != nil {
 		return fmt.Errorf("CreateDiscussion, %v", err)
